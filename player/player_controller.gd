@@ -1,6 +1,22 @@
 extends CharacterBody3D
 class_name PlayerController
 
+## ============================================================================
+## PlayerController — Movement & Animation System
+## ============================================================================
+## Handles player movement, camera control, animations, and interactions.
+## Supports 3 camera modes: Third-person, Front view, and First-person.
+## First-person mode with mouse look enabled for immersive gameplay.
+## 
+## Controls:
+##   W/A/S/D     — Move forward/left/back/right
+##   SHIFT       — Sprint (faster movement with Run animation)
+##   SPACE       — Jump
+##   V           — Attack action
+##   F5          — Switch camera mode
+##   ESC         — Pause menu
+##   Mouse       — Look around (First-person mode)
+
 @export var move_speed := 5.5
 @export var sprint_speed := 9.0
 @export var acceleration := 14.0
@@ -14,10 +30,8 @@ class_name PlayerController
 @onready var mesh_root: Node3D = $MeshRoot
 
 # ── Animation ───────────────────────────────────────────────────────────
-# TODO: Pfad prüfen, sobald businessman_animation.glb neu instanziert ist
 @onready var anim_player: AnimationPlayer = get_node_or_null("MeshRoot/Model/AnimationPlayer")
 
-# TODO: Clip-Namen im Animation-Panel (unten in Godot) nachsehen und eintragen
 const ANIM_IDLE   := "Idle"
 const ANIM_WALK   := "Walk"
 const ANIM_RUN    := "Run"
@@ -62,21 +76,27 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# Gravity & Jumping
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_velocity
 
+	# Movement input (local space)
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var dir := (transform.basis * Vector3(input.x, 0, input.y)).normalized()
+	
+	# Sprint handling
 	var is_sprinting := Input.is_action_pressed("sprint")
 	var speed: float = sprint_speed if is_sprinting else move_speed
 
+	# Smooth velocity transitions
 	velocity.x = lerp(velocity.x, dir.x * speed, acceleration * delta)
 	velocity.z = lerp(velocity.z, dir.z * speed, acceleration * delta)
 	move_and_slide()
 	update_head(delta)
 
+	# Update animations and handle attacks
 	_update_animation(input, is_sprinting)
 	if Input.is_action_just_pressed("attack"):
 		_try_attack()
@@ -92,14 +112,17 @@ func change_camera() -> void:
 func _apply_camera_mode() -> void:
 	match camera_mode:
 		CameraMode.THIRD:
+			# Third-person: over-the-shoulder view
 			spring_arm.spring_length = 4.5
 			spring_arm.rotation.y = 0
 			mesh_root.visible = true
 		CameraMode.FRONT:
+			# Front camera: facing player
 			spring_arm.spring_length = 4.5
 			spring_arm.rotation.y = PI
 			mesh_root.visible = true
 		CameraMode.FIRST:
+			# First-person: camera inside head
 			spring_arm.spring_length = 0.05
 			mesh_root.visible = false
 
@@ -132,6 +155,7 @@ func _try_attack() -> void:
 
 
 # ── Kopf-Blick (Bone-basiert) ────────────────────────────────────────────
+## Head tracking system: rotates head bone based on camera pitch & yaw
 
 func _find_head_bone() -> void:
 	skeleton = find_skeleton(mesh_root)
