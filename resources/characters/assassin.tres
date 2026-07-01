@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"assassin"
+display_name = "Assassine"
+lore_text = "Kein Name, kein Gesicht, kein Zögern. Du wurdest engagiert, einen Konkurrenten zu eliminieren. Oder alle. Je nach Auftrag. Das Kasino ist nur der Tatort."
+gender_options = ["m", "f", "nb"]
+start_health = 3
+start_suspicion = 0
+start_heat = 0
+start_influence = 2
+start_chips = 50
+smuggle_slots = 3
+guaranteed_items = [&"poison_needle"]
+allowed_item_categories = ["weapon", "gadget", "intel"]
+entry_bonus_id = &"bonus_silent_entry"
+passive_ability_id = &"passive_silent_kill"
+active_ability_id = &"active_vanish"
+primary_objective = "eliminate_rivals"
+unlocked_by_default = true

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"government_agent"
+display_name = "Regierungsagent"
+lore_text = "Offiziell: Urlaub. Inoffiziell: Mission. Du hast Befugnisse, die niemand hier kennt — und Methoden, die niemand kennen darf."
+gender_options = ["m", "f"]
+start_health = 3
+start_suspicion = 0
+start_heat = 1
+start_influence = 4
+start_chips = 60
+smuggle_slots = 2
+guaranteed_items = [&"fake_id", &"listening_bug"]
+allowed_item_categories = ["intel", "gadget", "weapon", "tool"]
+entry_bonus_id = &"bonus_clearance_level"
+passive_ability_id = &"passive_counter_intel"
+active_ability_id = &"active_extraction"
+primary_objective = "survive_undetected"
+unlocked_by_default = true

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"citizen"
+display_name = "Normalbürger"
+lore_text = "Du solltest heute nicht hier sein. Kein Plan, keine Verbündeten, kein Budget. Nur du, dein Mut — und die Tatsache, dass dich niemand ernst nimmt. Das ist dein Vorteil."
+gender_options = ["m", "f", "nb"]
+start_health = 5
+start_suspicion = 0
+start_heat = 0
+start_influence = 1
+start_chips = 30
+smuggle_slots = 1
+guaranteed_items = []
+allowed_item_categories = []
+entry_bonus_id = &"bonus_invisible_entry"
+passive_ability_id = &"passive_underestimated"
+active_ability_id = &"active_wild_card"
+primary_objective = "survive_undetected"
+unlocked_by_default = true

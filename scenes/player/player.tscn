@@ -1,0 +1,58 @@
+[gd_scene load_steps=4 format=3 uid="uid://b4x3ane467pnl"]
+
+[ext_resource type="Script" uid="uid://daobfjw32hbfc" path="res://scripts/player/player_controller.gd" id="1_pctrl"]
+[ext_resource type="Script" uid="uid://ckvm5av1or8ve" path="res://scripts/player/player_action_handler.gd" id="2_action"]
+[ext_resource type="PackedScene" path="res://scripts/player/businessman_animation.glb" id="3_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 0.4
+height = 1.8
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_pctrl")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(
+1,0,0,
+0,1,0,
+0,0,1,
+0,0.9,0
+)
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="MeshRoot" type="Node3D" parent="."]
+transform = Transform3D(
+1,0,0,
+0,1,0,
+0,0,1,
+0,0.9,0
+)
+
+[node name="Model" parent="MeshRoot" instance=ExtResource("3_model")]
+transform = Transform3D(
+-1,0,-0.000000087,
+0,1,0,
+0.000000087,0,-1,
+0,0,0
+)
+
+[node name="CameraPivot" type="Node3D" parent="."]
+transform = Transform3D(
+1,0,0,
+0,1,0,
+0,0,1,
+0,1.65,0
+)
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot"]
+spring_length = 0.0
+margin = 0.01
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D"]
+current = true
+near = 0.03
+far = 1000.0
+fov = 75.0
+
+[node name="PlayerActionHandler" type="Node" parent="."]
+script = ExtResource("2_action")

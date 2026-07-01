@@ -1,0 +1,110 @@
+[gd_scene load_steps=11 format=3 uid="uid://b9rushgameworld"]
+
+[ext_resource type="Script" path="res://scripts/world/game_world.gd" id="1_gw"]
+[ext_resource type="PackedScene" uid="uid://b1pl4y3rrushp" path="res://scenes/player/player.tscn" id="2_player"]
+
+[sub_resource type="ProceduralSkyMaterial" id="Sky_1"]
+sky_top_color = Color(0.02, 0.02, 0.03, 1)
+sky_horizon_color = Color(0.05, 0.04, 0.03, 1)
+ground_bottom_color = Color(0.01, 0.01, 0.01, 1)
+ground_horizon_color = Color(0.05, 0.04, 0.03, 1)
+sun_angle_max = 30.0
+
+[sub_resource type="Sky" id="Sky_2"]
+sky_material = SubResource("Sky_1")
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 2
+sky = SubResource("Sky_2")
+ambient_light_source = 3
+ambient_light_color = Color(0.6, 0.5, 0.3, 1)
+ambient_light_energy = 0.15
+tonemap_mode = 2
+tonemap_exposure = 1.1
+glow_enabled = true
+glow_intensity = 0.6
+glow_bloom = 0.15
+fog_enabled = true
+fog_light_color = Color(0.04, 0.03, 0.02, 1)
+fog_density = 0.012
+
+[sub_resource type="PlaneMesh" id="Plane_floor"]
+size = Vector2(120, 120)
+subdivide_width = 8
+subdivide_depth = 8
+
+[sub_resource type="StandardMaterial3D" id="Mat_floor"]
+albedo_color = Color(0.025, 0.022, 0.02, 1)
+metallic = 0.4
+roughness = 0.55
+
+[sub_resource type="BoxShape3D" id="Box_floor"]
+size = Vector3(120, 0.2, 120)
+
+[sub_resource type="BoxMesh" id="Box_pillar"]
+size = Vector3(1, 4, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_gold_pillar"]
+albedo_color = Color(0.9, 0.72, 0.3, 1)
+metallic = 1.0
+roughness = 0.3
+emission_enabled = true
+emission = Color(0.6, 0.45, 0.15, 1)
+emission_energy_multiplier = 0.4
+
+[node name="GameWorld" type="Node3D"]
+script = ExtResource("1_gw")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 12, 0)
+light_color = Color(1, 0.88, 0.65, 1)
+light_energy = 1.4
+shadow_enabled = true
+
+[node name="RimLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4, -6)
+light_color = Color(0.4, 0.7, 1, 1)
+light_energy = 1.2
+omni_range = 25.0
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("Plane_floor")
+surface_material_override/0 = SubResource("Mat_floor")
+
+[node name="FloorCollision" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+shape = SubResource("Box_floor")
+
+[node name="Pillars" type="Node3D" parent="."]
+
+[node name="Pillar1" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2, -4)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillars/Pillar1"]
+mesh = SubResource("Box_pillar")
+surface_material_override/0 = SubResource("Mat_gold_pillar")
+
+[node name="Col" type="CollisionShape3D" parent="Pillars/Pillar1"]
+shape = SubResource("Box_floor")
+
+[node name="Pillar2" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2, 5)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillars/Pillar2"]
+mesh = SubResource("Box_pillar")
+surface_material_override/0 = SubResource("Mat_gold_pillar")
+
+[node name="Pillar3" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -12)
+
+[node name="Mesh" type="MeshInstance3D" parent="Pillars/Pillar3"]
+mesh = SubResource("Box_pillar")
+surface_material_override/0 = SubResource("Mat_gold_pillar")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

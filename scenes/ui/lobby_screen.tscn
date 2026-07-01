@@ -1,0 +1,105 @@
+[gd_scene load_steps=2 format=3 uid="uid://np_lobby_001"]
+
+[ext_resource type="Script" path="res://scripts/ui/lobby_ui.gd" id="1"]
+
+[node name="LobbyScreen" type="Control"]
+script = ExtResource("1")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.04, 0.06, 1)
+
+[node name="MainVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -340.0
+offset_right = 300.0
+offset_bottom = 340.0
+theme_override_constants/separation = 12
+
+[node name="TitleLbl" type="Label" parent="MainVBox"]
+layout_mode = 2
+text = "LOBBY"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 26
+
+[node name="NameRow" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="NameLbl" type="Label" parent="MainVBox/NameRow"]
+layout_mode = 2
+text = "Dein Name:"
+vertical_alignment = 1
+
+[node name="NameInput" type="LineEdit" parent="MainVBox/NameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 40)
+placeholder_text = "Name eingeben"
+
+[node name="HostBtn" type="Button" parent="MainVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 48)
+text = "Server hosten"
+
+[node name="JoinRow" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AddressInput" type="LineEdit" parent="MainVBox/JoinRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 40)
+placeholder_text = "IP-Adresse"
+
+[node name="JoinBtn" type="Button" parent="MainVBox/JoinRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(110, 40)
+text = "Beitreten"
+
+[node name="HSep" type="HSeparator" parent="MainVBox"]
+layout_mode = 2
+
+[node name="PlayerListLbl" type="Label" parent="MainVBox"]
+layout_mode = 2
+text = "Verbundene Spieler:"
+theme_override_font_sizes/font_size = 14
+
+[node name="PlayerListContainer" type="VBoxContainer" parent="MainVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 100)
+
+[node name="HSep2" type="HSeparator" parent="MainVBox"]
+layout_mode = 2
+
+[node name="StartBtn" type="Button" parent="MainVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
+text = "Match starten (Host)"
+disabled = true
+theme_override_font_sizes/font_size = 16
+
+[node name="BackBtn" type="Button" parent="MainVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+text = "← Zurück"
+
+[node name="StatusLabel" type="Label" parent="MainVBox"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 2
+modulate = Color(0.85, 0.75, 0.3, 1)

@@ -1,0 +1,4 @@
+[gd_resource type="Resource" script_class="ItemAiLens" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/items/gadgets/item_ai_lens.gd" id="1"]
+[resource]
+script = ExtResource("1")

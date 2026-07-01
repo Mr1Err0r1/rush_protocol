@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"mafia_boss"
+display_name = "Mafia-Boss"
+lore_text = "Du hast Generationen aufgebaut, um diesen Moment vorzubereiten. Das Kasino soll deins werden — mit Bestechung, Einschüchterung oder dem Revolver. Alle kennen deinen Namen. Das ist dein Vorteil und dein Fluch."
+gender_options = ["m", "f"]
+start_health = 4
+start_suspicion = 1
+start_heat = 3
+start_influence = 4
+start_chips = 80
+smuggle_slots = 2
+guaranteed_items = [&"revolver"]
+allowed_item_categories = []
+entry_bonus_id = &"bonus_dealer_bribed"
+passive_ability_id = &"passive_fear_aura"
+active_ability_id = &"active_mob_call"
+primary_objective = "control_casino"
+unlocked_by_default = true

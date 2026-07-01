@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"undercover_cop"
+display_name = "Verdeckter Ermittler"
+lore_text = "Du bist hier um Beweise zu sammeln, nicht um zu spielen. Aber manchmal muss man mitspielen, um das Spiel zu stoppen. Deine Dienstwaffe ist dein Geheimnis."
+gender_options = ["m", "f"]
+start_health = 3
+start_suspicion = 0
+start_heat = 0
+start_influence = 3
+start_chips = 40
+smuggle_slots = 1
+guaranteed_items = [&"ai_lens"]
+allowed_item_categories = ["intel", "gadget", "tool"]
+entry_bonus_id = &"bonus_badge_access"
+passive_ability_id = &"passive_read_suspects"
+active_ability_id = &"active_arrest"
+primary_objective = "expose_criminals"
+unlocked_by_default = true

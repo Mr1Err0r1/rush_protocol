@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"millionaire"
+display_name = "Millionär"
+lore_text = "Money talks. Du bist der einzige im Raum der genug Chips hat um jeden zu kaufen — Dealer, Security, Mitbewerber. Dein einziges Problem: alle wissen es."
+gender_options = ["m", "f"]
+start_health = 3
+start_suspicion = 2
+start_heat = 2
+start_influence = 5
+start_chips = 150
+smuggle_slots = 2
+guaranteed_items = [&"coin"]
+allowed_item_categories = ["chip", "tool", "disguise"]
+entry_bonus_id = &"bonus_vip_entry"
+passive_ability_id = &"passive_high_roller"
+active_ability_id = &"active_buyout"
+primary_objective = "reach_vault"
+unlocked_by_default = true
