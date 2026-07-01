@@ -13,7 +13,7 @@ class_name PlayerController
 @onready var spring_arm: SpringArm3D = $CameraPivot/SpringArm3D
 @onready var mesh_root: Node3D = $MeshRoot
 
-# ── Animation ─────────────────────────────────────────────────────────────
+# ── Animation ───────────────────────────────────────────────────────────
 # TODO: Pfad prüfen, sobald businessman_animation.glb neu instanziert ist
 @onready var anim_player: AnimationPlayer = get_node_or_null("MeshRoot/Model/AnimationPlayer")
 
@@ -178,3 +178,4 @@ func _setup_input() -> void:
 			var e := InputEventKey.new()
 			e.physical_keycode = keys[action]
 			InputMap.action_add_event(action, e)
+
