@@ -1,0 +1,12 @@
+WICHTIG: Füge in den Godot-Projekteinstellungen (Project Settings -> Autoload) folgende Scripts hinzu:
+
+1. LocaleManager -> res://scripts/autoload/locale_manager.gd
+2. (Sicherstellen, dass SaveManager, EventBus, GameManager etc. bereits drin sind)
+
+Änderungen in dieser Version:
+- Typfehler in lobby_ui.gd behoben (is_host / is_me).
+- LocaleManager implementiert für DE, EN, RU.
+- SettingsUI Logik für Monitor, Vollbild, VSync und Sprache erstellt.
+- CharacterCustomizationUI Logik für Aussehen und Personalisierung erstellt.
+- MainMenuUI auf Mehrsprachigkeit umgestellt.
+- MenuBackground für das "Elite Casino" Design vorbereitet.
