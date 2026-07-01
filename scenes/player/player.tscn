@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://daobfjw32hbfc" path="res://scripts/player/player_controller.gd" id="1_pctrl"]
 [ext_resource type="Script" uid="uid://ckvm5av1or8ve" path="res://scripts/player/player_action_handler.gd" id="2_action"]
-[ext_resource type="PackedScene" path="res://scripts/player/businessman_animation.glb" id="3_model"]
+[ext_resource type="PackedScene" path="res://player/businessman_animation.glb" id="3_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.4
@@ -25,14 +25,14 @@ transform = Transform3D(
 1,0,0,
 0,1,0,
 0,0,1,
-0,0.9,0
+0,0,0
 )
 
 [node name="Model" parent="MeshRoot" instance=ExtResource("3_model")]
 transform = Transform3D(
--1,0,-0.000000087,
+1,0,0,
 0,1,0,
-0.000000087,0,-1,
+0,0,1,
 0,0,0
 )
 
@@ -56,3 +56,4 @@ fov = 75.0
 
 [node name="PlayerActionHandler" type="Node" parent="."]
 script = ExtResource("2_action")
+
