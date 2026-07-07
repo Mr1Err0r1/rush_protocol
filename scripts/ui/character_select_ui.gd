@@ -3,10 +3,6 @@ class_name CharacterSelectUI
 ## CharacterSelectUI — Null Protocol
 ## Zeigt alle verfügbaren Charakterklassen, Geschlecht-Wahl und Loadout-Auswahl.
 ## Reagiert auf EventBus-Signale, sendet Auswahl über RpcRelay oder direkt.
-##
-## Solo-Modus: nur Mafia-Boss ist wählbar, alle anderen Klassen sind gesperrt.
-
-const SOLO_ALLOWED_CLASS := &"mafia_boss"
 
 @onready var class_list:      ItemList    = $HBox/Left/ClassList
 @onready var class_name_lbl:  Label       = $HBox/Right/ClassName
@@ -39,26 +35,15 @@ func set_rpc_relay(relay: Node) -> void:
 	_rpc_relay = relay
 
 
-func _is_solo() -> bool:
-	return GameManager.game_mode == GameManager.GameMode.SOLO
-
-
 func _populate_class_list() -> void:
 	class_list.clear()
 	var classes := _get_available_classes()
-	var solo_locked := _is_solo()
-	var preferred = SOLO_ALLOWED_CLASS if solo_locked else SaveManager.get_last_character()
+	var preferred := SaveManager.get_last_character()
 	var preferred_index := 0
-
 	for i in classes.size():
 		var cc = classes[i]
 		class_list.add_item(cc.display_name)
 		class_list.set_item_metadata(class_list.item_count - 1, cc.class_id)
-
-		if solo_locked and cc.class_id != SOLO_ALLOWED_CLASS:
-			class_list.set_item_disabled(class_list.item_count - 1, true)
-			class_list.set_item_tooltip(class_list.item_count - 1, "Im Solo-Modus gesperrt")
-
 		if cc.class_id == preferred:
 			preferred_index = i
 
@@ -129,6 +114,7 @@ func _show_class_info(cc: CharacterClass) -> void:
 	class_lore_lbl.text = cc.lore_text
 	smuggle_label.text  = "Schmuggel-Slots: %d" % cc.smuggle_slots
 
+	# Stats in GridContainer darstellen
 	for child in stats_panel.get_children():
 		child.queue_free()
 	_add_stat_row("❤ Leben",      cc.start_health,    5)
@@ -171,6 +157,8 @@ func _populate_loadout_slots(cc: CharacterClass) -> void:
 
 
 func _open_item_picker(slot_index: int, slot_btn: Button, _cc: CharacterClass) -> void:
+	## In einem vollständigen Projekt würde hier ein modales Popup-Menü öffnen.
+	## Für dieses Gerüst: zyklisch durch verfügbare Items rotieren.
 	var smuggleable := ItemDatabase.get_smuggleable_items()
 	if smuggleable.is_empty():
 		return
@@ -199,10 +187,9 @@ func _on_confirm_pressed() -> void:
 		return
 
 	confirm_btn.disabled = true
+	status_lbl.text      = "Bestätigt — warte auf andere Spieler..."
 	EventBus.audio_play_sfx.emit("ui_click")
-
-	if not _is_solo():
-		SaveManager.set_last_character(_selected_class_id)
+	SaveManager.set_last_character(_selected_class_id)
 
 	var items: Array[StringName] = []
 	for iid in _selected_items:
@@ -210,11 +197,8 @@ func _on_confirm_pressed() -> void:
 			items.append(iid)
 
 	if _rpc_relay != null:
-		status_lbl.text = "Bestätigt — warte auf andere Spieler..."
 		_rpc_relay.request_select_character(_local_player_id, _selected_class_id, _selected_gender)
 		_rpc_relay.request_confirm_loadout(_local_player_id, items)
-	else:
-		status_lbl.text = "Bestätigt — betrete den Casino-Boden..."
-		if GameManager.active_match != null:
-			GameManager.active_match.select_character(_local_player_id, _selected_class_id, _selected_gender)
-			GameManager.active_match.confirm_loadout(_local_player_id, items)
+	elif GameManager.active_match != null:
+		GameManager.active_match.select_character(_local_player_id, _selected_class_id, _selected_gender)
+		GameManager.active_match.confirm_loadout(_local_player_id, items)

@@ -3,14 +3,16 @@ class_name PauseMenu
 
 ## PauseMenu — Rush Protocol
 ## CanvasLayer layer=100, process_mode=ALWAYS → aktiv auch bei pausiertem Tree.
-## Nutzt _KeyBindingsPanel für Tastenbelegung (kein Code-Duplikat mit Settings).
+## Nutzt KeyBindingsPanel für Tastenbelegung (kein Code-Duplikat mit Settings).
 ##
 ## ESC-Verhalten:
 ##   Hauptseite      → Weiterspielen
 ##   Steuerungsseite → zurück zur Hauptseite
-##   Rebind aktiv    → Rebind abbrechen (_KeyBindingsPanel konsumiert Event)
+##   Rebind aktiv    → Rebind abbrechen (KeyBindingsPanel konsumiert Event)
 
-# ── Farben ────────────────────────────────────────────────────────────────
+const KeyBindingsPanel = preload("res://scripts/ui/key_bindings_panel.gd")
+
+# ── Farben ────────────────────────────────────────────────────────────────────
 const C_OVERLAY    := Color(0.04, 0.03, 0.05, 0.88)
 const C_PANEL      := Color(0.10, 0.08, 0.13, 1.0)
 const C_PANEL_BORD := Color(0.62, 0.46, 0.10, 1.0)
@@ -22,19 +24,19 @@ const C_TEXT       := Color(0.92, 0.88, 0.84, 1.0)
 const C_TEXT_DIM   := Color(0.56, 0.50, 0.44, 1.0)
 const C_DIVIDER    := Color(0.40, 0.28, 0.06, 0.55)
 
-# ── Node-Refs ────────────────────────────────────────────────────────────────
+# ── Node-Refs ─────────────────────────────────────────────────────────────────
 var _page_main: Control = null
 var _page_ctrl: Control = null
 var _kbp:       KeyBindingsPanel = null   # KeyBindingsPanel-Instanz
 
-# ── Styles ────────────────────────────────────────────────────────────────
+# ── Styles ────────────────────────────────────────────────────────────────────
 var _sty_panel: StyleBoxFlat
 var _sty_btn_n: StyleBoxFlat
 var _sty_btn_h: StyleBoxFlat
 var _sty_btn_p: StyleBoxFlat
 
 
-# ── Lifecycle ─────────────────────────────────────────────────────────────
+# ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -57,7 +59,7 @@ func _close() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
-# ── Input ─────────────────────────────────────────────────────────────────
+# ── Input ─────────────────────────────────────────────────────────────────────
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
@@ -75,7 +77,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 
-# ── UI-Aufbau ────────────────────────────────────────────────────────────
+# ── UI-Aufbau ─────────────────────────────────────────────────────────────────
 
 func _build_ui() -> void:
 	# Hintergrund
@@ -233,7 +235,7 @@ func _divider(mt: int = 8, mb: int = 8) -> Control:
 	return m
 
 
-# ── Seiten ────────────────────────────────────────────────────────────────
+# ── Seiten ────────────────────────────────────────────────────────────────────
 
 func _show_main() -> void:
 	_page_main.visible = true
@@ -246,7 +248,7 @@ func _show_ctrl() -> void:
 	_kbp.refresh()   # Immer frisch lesen (sprint/jump kommen erst nach PlayerController._ready)
 
 
-# ── Aktionen ──────────────────────────────────────────────────────────────
+# ── Aktionen ─────────────────────────────────────────────────────────────────
 
 func _on_resume() -> void:
 	GameManager.toggle_pause()
@@ -259,7 +261,7 @@ func _on_menu() -> void:
 	GameManager.return_to_menu()
 
 
-# ── Styles ────────────────────────────────────────────────────────────────
+# ── Styles ────────────────────────────────────────────────────────────────────
 
 func _make_styles() -> void:
 	_sty_panel = StyleBoxFlat.new()

@@ -1,6 +1,7 @@
 extends Control
 class_name SettingsUI
 
+const KeyBindingsPanel = preload("res://scripts/ui/key_bindings_panel.gd")
 var _bindings_overlay: Control = null
 var _kbp: KeyBindingsPanel = null
 ## SettingsUI — Null Protocol
@@ -93,7 +94,7 @@ func _load_settings() -> void:
 	# Vollbild
 	var mode: int = DisplayServer.window_get_mode()
 	fullscreen_chk.button_pressed = (mode == DisplayServer.WINDOW_MODE_FULLSCREEN or
-							mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+									mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
 
 	# V-Sync
 	vsync_chk.button_pressed = (DisplayServer.window_get_vsync_mode() != DisplayServer.VSYNC_DISABLED)
@@ -213,7 +214,7 @@ func _update_texts(_l = null) -> void:
 func _lm() -> Node:
 	return get_node_or_null("/root/LocaleManager")
 
-# ── Tastenbelegung ────────────────────────────────────────────────────────
+# ── Tastenbelegung ────────────────────────────────────────────────────────────
 
 func _inject_bindings_ui() -> void:
 	var btn := Button.new()
