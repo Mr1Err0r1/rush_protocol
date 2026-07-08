@@ -13,20 +13,20 @@ config_version=5
 config/name="Rush_Protocol"
 config/version="0.2.0"
 config/tags=PackedStringArray("game")
-run/main_scene="uid://dmwonwwrm3ald"
+run/main_scene="res://scenes/world/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-EventBus="*res://scripts/autoload/event_bus.gd"
-GameManager="*res://scripts/autoload/game_manager.gd"
-NetworkManager="*res://scripts/autoload/network_manager.gd"
-ItemDatabase="*res://scripts/autoload/item_database.gd"
-AudioManager="*res://scripts/autoload/audio_manager.gd"
-SaveManager="*res://scripts/autoload/save_manager.gd"
-LocaleManager="*res://scripts/autoload/locale_manager.gd"
-VisualFX="*res://scripts/autoload/visual_fx.gd"
+EventBus="*res://autoload/event_bus.gd"
+GameManager="*res://autoload/game_manager.gd"
+NetworkManager="*res://autoload/network_manager.gd"
+ItemDatabase="*res://autoload/item_database.gd"
+AudioManager="*res://autoload/audio_manager.gd"
+SaveManager="*res://autoload/save_manager.gd"
+LocaleManager="*res://autoload/locale_manager.gd"
+VisualFX="*res://autoload/visual_fx.gd"
 
 [display]
 

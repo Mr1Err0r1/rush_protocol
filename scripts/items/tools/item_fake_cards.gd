@@ -20,8 +20,7 @@ func _init() -> void:
 	suspicion_on_use   = 0   # erstmal unsichtbar
 
 
-func execute_effect(user_state: PlayerState, _target_state: PlayerState,
-		match_ctrl: Node) -> Dictionary:
+func execute_effect(_user_state: PlayerState, target_state: PlayerState, match_ctrl: Node) -> Dictionary:
 	# Erzwingt dass der nächste Risiko-Outcome "positiv" ist
 	var risk_ctrl = match_ctrl.risk_controller
 	if risk_ctrl == null:

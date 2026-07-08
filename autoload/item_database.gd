@@ -5,6 +5,7 @@ extends Node
 
 const ITEMS_PATH := "res://resources/items/"
 
+
 var _db: Dictionary = {}   # StringName → ItemDefinition
 
 
@@ -47,16 +48,27 @@ func get_smuggleable_items() -> Array:
 func _scan_folder(path: String) -> void:
 	var dir := DirAccess.open(path)
 	if dir == null:
+		push_error("[ItemDB] Konnte Ordner nicht öffnen: " + path)
 		return
+		
 	dir.list_dir_begin()
 	var fname := dir.get_next()
+	
 	while fname != "":
-		var full := path + fname
-		if dir.current_is_dir() and not fname.begins_with("."):
-			_scan_folder(full + "/")
+		# Nutze path_join, um sicherzugehen, dass immer ein "/" dazwischen ist
+		var full := path.path_join(fname)
+		
+		if dir.current_is_dir():
+			if not fname.begins_with("."):
+				_scan_folder(full)
 		elif fname.ends_with(".tres"):
-			var res := load(full)
-			if res != null and res.get("item_id") != null and res.item_id != &"":
-				_db[res.item_id] = res
+			var res = load(full)
+			if res != null:
+				# Überprüfe, ob es wirklich eine ItemDefinition ist
+				if res.get("item_id") != null and res.item_id != &"":
+					_db[res.item_id] = res
+				else:
+					push_warning("[ItemDB] Resource in %s hat keine gültige item_id." % full)
+					
 		fname = dir.get_next()
 	dir.list_dir_end()

@@ -153,23 +153,26 @@ func perform_entry_check(player_state: PlayerState, character: CharacterClass) -
 	}
 	
 	for item_id in player_state.inventory:
-		var item_def: ItemDefinition = ItemDatabase.get_item(item_id)
-		if not item_def or not item_def.can_be_smuggled: continue
+		var item_def = ItemDatabase.get_item(item_id)
+		if not item_def or not item_def.can_be_smuggled: 
+			continue
 		
 		var detection_chance = item_def.confiscation_chance
 		if character:
 			detection_chance -= character.detection_resistance
 		
-		if item_def.is_metallic:
-			detection_chance += 0.3
+		# KORREKTUR: Da 'is_metallic' nicht existiert, nutzen wir 'detection_weight' als Faktor
+		if item_def.detection_weight > 7:
+			detection_chance += 0.2
 			
 		if randf() < detection_chance:
 			results.detected_items.append(item_id)
-			results.suspicion_gain += item_def.suspicion_on_detection
+			# KORREKTUR: Nutze 'suspicion_on_use' oder fixen Wert, da 'suspicion_on_detection' fehlt
+			results.suspicion_gain += 2 
 			results.passed = false
 			item_confiscated.emit(player_state.player_id, item_id)
 	
-	player_state.suspicion += results.suspicion_gain
+	player_state.modify_resource("suspicion", results.suspicion_gain)
 	if results.suspicion_gain > 0:
 		player_detected.emit(player_state.player_id, results.suspicion_gain)
 		

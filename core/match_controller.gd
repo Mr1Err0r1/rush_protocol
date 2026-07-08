@@ -35,7 +35,8 @@ var _boss_health:        int   = 8
 # ── Sub-Controller ────────────────────────────────────────────────────────────
 @onready var risk_controller:  RiskController       = $RiskController
 @onready var entry_controller: EntryPhaseController = $EntryPhaseController
-@onready var rpc_relay:        Node                 = $RpcRelay   # NetworkRpcRelay
+#@onready var rpc_relay:        Node                 = $RpcRelay   # NetworkRpcRelay
+@onready var rpc_relay = get_node_or_null("RpcRelay")
 
 # ── Charakter-Klassen-Cache ───────────────────────────────────────────────────
 var _char_classes: Dictionary = {}   # StringName → CharacterClass
