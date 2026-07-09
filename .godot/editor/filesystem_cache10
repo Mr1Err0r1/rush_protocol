@@ -1,5 +1,5 @@
 78098b89c88a74ebe8c20117b8754620
-::res://::1783495698
+::res://::1783496789
 icon.svg::::-1::1782985976::1782985976::0::::<><><>0<>0<>1bf2354b627b8ccc5b88361104c99702<>::
 project_update_note.txt::TextFile::-1::1782985977::0::1::::<><><>0<>0<><>::
 README.md::TextFile::-1::1782985976::0::1::::<><><>0<>0<><>::
@@ -133,7 +133,7 @@ player_action_handler.gd::GDScript::5518863947973755194::1782985977::0::1::::Pla
 player_controller.gd::GDScript::7188233493602828824::1782985977::0::1::::PlayerController<>CharacterBody3D<><>0<>0<><>::
 ::res://scripts/ui/::1783432046
 character_customization_ui.gd::GDScript::2046141340134223005::1782985977::0::1::::CharacterCustomizationUI<>Control<><>0<>0<><>::
-character_gallery_ui.gd::GDScript::2128033642966947472::1782985977::0::1::::CharacterGalleryUI<>Control<><>0<>0<><>::
+character_gallery_ui.gd::GDScript::2128033642966947472::1783496741::0::1::::CharacterGalleryUI<>Control<><>0<>0<><>::
 character_select_ui.gd::GDScript::4348317586522975433::1782985977::0::1::::CharacterSelectUI<>Control<><>0<>0<><>::
 key_bindings_panel.gd::GDScript::6691576787032073632::1782985977::0::1::::KeyBindingsPanel<>VBoxContainer<><>0<>0<><>::
 lobby_ui.gd::GDScript::4547038206848982516::1782985977::0::1::::<>Control<><>0<>0<><>::
@@ -143,7 +143,7 @@ menu_background.gd::GDScript::6332160218647115289::1782985977::0::1::::<>Control
 menu_background_3d.gd::GDScript::8852553096498022017::1782985977::0::1::::<>Node3D<><>0<>0<><>::
 pause_menu.gd::GDScript::4862679084770278259::1782985977::0::1::::PauseMenu<>CanvasLayer<><>0<>0<><>::
 screen_flash.gd::GDScript::6027702157895907454::1782985977::0::1::::<>ColorRect<><>0<>0<><>::
-settings_ui.gd::GDScript::5491218585225989689::1782985977::0::1::::SettingsUI<>Control<><>0<>0<><>::
+settings_ui.gd::GDScript::6898545641786472497::1783496300::0::1::::SettingsUI<>Control<><>0<>0<><>::
 solo_character_select.gd::GDScript::2720783973384849868::1782985977::0::1::::SoloCharacterSelect<>Control<><>0<>0<><>::
 ::res://scripts/world/::1783432047
 game_world.gd::GDScript::5080115338237069699::1782985977::0::1::::<>Node3D<><>0<>0<><>::
