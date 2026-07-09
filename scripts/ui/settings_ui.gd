@@ -27,7 +27,13 @@ class_name SettingsUI
 signal settings_applied
 signal settings_reset
 
-const KEY_BINDINGS_SCENE: PackedScene = preload("res://scenes/ui/key_bindings_panel.tscn")
+# HINWEIS: Ursprünglich stand hier `preload("res://scenes/ui/key_bindings_panel.tscn")`.
+# preload() wird zur PARSE-Zeit aufgelöst — existiert die Datei nicht, bricht
+# das gesamte Script schon beim Laden ab (das war der gemeldete Fehler).
+# Da es in diesem Projekt keine solche .tscn gibt, wird KeyBindingsPanel direkt
+# als Skript instanziert. Falls später doch eine Szene dafür angelegt wird,
+# übernimmt _create_kbp() sie automatisch (per Laufzeit-load(), kein preload()).
+const KEY_BINDINGS_SCENE_PATH := "res://scenes/ui/key_bindings_panel.tscn"
 
 # ── Default-Werte (einzige Quelle der Wahrheit für "Zurücksetzen") ──────────
 const DEFAULT_SFX_DB          := 0.0
@@ -832,6 +838,19 @@ func _inject_bindings_ui() -> void:
 	_build_bindings_overlay()
 
 
+## Lädt die Szene nur, falls sie tatsächlich existiert (ResourceLoader.exists
+## prüft zur LAUFZEIT, nicht zur Parse-Zeit — dadurch kein harter Compile-Fehler
+## mehr, falls die .tscn fehlt). Andernfalls reine Skript-Instanz.
+func _create_kbp() -> KeyBindingsPanel:
+	if ResourceLoader.exists(KEY_BINDINGS_SCENE_PATH):
+		var packed: PackedScene = load(KEY_BINDINGS_SCENE_PATH)
+		var inst := packed.instantiate()
+		if inst is KeyBindingsPanel:
+			return inst
+		inst.queue_free()
+	return KeyBindingsPanel.new()
+
+
 func _build_bindings_overlay() -> void:
 	const C_PANEL      := Color(0.10, 0.08, 0.13, 0.98)
 	const C_PANEL_BORD := Color(0.62, 0.46, 0.10, 1.0)
@@ -897,9 +916,7 @@ func _build_bindings_overlay() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	v.add_child(scroll)
 
-	# Bugfix: vorher KeyBindingsPanel.new() -> preload() wurde nie genutzt und
-	# eine evtl. in der .tscn definierte Struktur ging verloren.
-	_kbp = KEY_BINDINGS_SCENE.instantiate() as KeyBindingsPanel
+	_kbp = _create_kbp()
 	_kbp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_kbp)
 
