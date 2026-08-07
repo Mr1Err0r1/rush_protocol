@@ -37,6 +37,9 @@ const ANIM_WALK   := "Walk"
 const ANIM_RUN    := "Run"
 const ANIM_ATTACK := "Attack"
 
+# Bullet scene preload
+const BULLET_SCENE := preload("res://scenes/player/bullet.tscn")
+
 var _attacking := false
 
 enum CameraMode { THIRD, FRONT, FIRST }
@@ -93,7 +96,8 @@ func _physics_process(delta: float) -> void:
 	# Smooth velocity transitions
 	velocity.x = lerp(velocity.x, dir.x * speed, acceleration * delta)
 	velocity.z = lerp(velocity.z, dir.z * speed, acceleration * delta)
-	move_and_slide()
+	# Explicit move_and_slide usage for clarity
+	velocity = move_and_slide(velocity, Vector3.UP)
 	update_head(delta)
 
 	# Update animations and handle attacks
@@ -153,6 +157,16 @@ func _try_attack() -> void:
 	await anim_player.animation_finished
 	_attacking = false
 
+	# --- spawn bullet (einfacher 'muzzle'-Spawn vor Kopf)
+	if BULLET_SCENE:
+		var b: Bullet = BULLET_SCENE.instantiate()
+		var muzzle_pos := global_transform.origin + (-global_transform.basis.z) * 1.8 + Vector3(0, 1.2, 0)
+		var dir := -global_transform.basis.z
+		b.global_transform.origin = muzzle_pos
+		if b.has_method("set_velocity"):
+			b.set_velocity(dir, 36.0)
+		get_tree().current_scene.add_child(b)
+
 
 # ── Kopf-Blick (Bone-basiert) ────────────────────────────────────────────
 ## Head tracking system: rotates head bone based on camera pitch & yaw
@@ -202,4 +216,3 @@ func _setup_input() -> void:
 			var e := InputEventKey.new()
 			e.physical_keycode = keys[action]
 			InputMap.action_add_event(action, e)
-
