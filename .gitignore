@@ -1,0 +1,15 @@
+.godot/
+.godot/*
+.godot/editor/
+.godot/editor/*
+.import/
+*.import
+*.tmp
+*~
+.DS_Store
+# Godot export and cache
+.export/
+
+# user/editor specific
+*.swp
+*.swo
