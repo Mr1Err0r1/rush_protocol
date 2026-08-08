@@ -165,6 +165,23 @@ func _try_attack() -> void:
 		b.global_transform.origin = muzzle_pos
 		if b.has_method("set_velocity"):
 			b.set_velocity(dir, 36.0)
+		# set shooter_id (versuche aus Node-Name Player_<id> zu extrahieren)
+		var shooter_id := -1
+		if typeof(name) == TYPE_STRING and name.begins_with("Player_"):
+			var parts := name.split("_")
+			if parts.size() >= 2:
+				shooter_id = int(parts[1])
+		else:
+			var node := get_parent()
+			while node:
+				if typeof(node.name) == TYPE_STRING and node.name.begins_with("Player_"):
+					var parts2 := node.name.split("_")
+					if parts2.size() >= 2:
+						shooter_id = int(parts2[1])
+						break
+				node = node.get_parent()
+		if b.has_variable("shooter_id"):
+			b.shooter_id = shooter_id
 		get_tree().current_scene.add_child(b)
 
 
