@@ -14,7 +14,7 @@ Die zentrale Fantasie ist ein sozialer Heist-Thriller: Mafia, Militär, Assassin
 ## 2. Spielablauf im aktuellen Prototyp
 
 1. **Spielstart und Modus:** Das Projekt hat Hauptmenü-Einstiegspunkte für Solo gegen KI, Lobby/Netzwerk und weitere lokale Match-Konfiguration.
-2. **Charakterwahl:** Jeder Spieler wählt eine `CharacterClass`. Die Rolle legt Startwerte, Fraktion, Schmuggel-Slots, Startausrüstung, mögliche Loadout-Kategorien und ein narratives Ziel fest.
+2. **Fraktion und Charakter:** Die Auswahl beginnt mit der Fraktion und zeigt danach nur die Rollen dieser Seite. Der Prototyp enthält sieben freigeschaltete Rollen in sieben Fraktionen; die zuletzt gewählte Rolle merkt sich das Spiel als Vorwahl. Die Rolle legt Startwerte, Schmuggel-Slots, Startausrüstung, mögliche Loadout-Kategorien und ein narratives Ziel fest.
 3. **Loadout:** Garantierte Rollen-Items kommen zusätzlich zu den wählbaren Slots ins Inventar. Wählbare Items müssen schmuggelbar sein und die erlaubten Kategorien der Rolle erfüllen. Die Prüfung geschieht in der UI und erneut in der Match-Logik.
 4. **Einlasskontrolle:** Nicht garantierte Items werden anhand ihrer Entdeckungswahrscheinlichkeit kontrolliert. Misstrauen beeinflusst das Risiko; entdeckte Items können beschlagnahmt werden. Zu viel Misstrauen oder mehrere entdeckte Gegenstände ohne Bestechung können zum Rauswurf führen.
 5. **Casino-Runden:** Runden besitzen die Zugphasen **Item**, **Aktion** und **Auflösung**. Items werden im Item-Schritt benutzt. In der Aktionsphase kann der aktuelle Risiko-Pool gezogen werden. Er verändert Chips und kann durch bestimmte Items beeinflusst werden.
