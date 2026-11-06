@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 class_id = &"millionaire"
+faction_id = &"elite"
 display_name = "Millionär"
 lore_text = "Money talks. Du bist der einzige im Raum der genug Chips hat um jeden zu kaufen — Dealer, Security, Mitbewerber. Dein einziges Problem: alle wissen es."
 gender_options = ["m", "f"]

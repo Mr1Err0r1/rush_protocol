@@ -6,6 +6,7 @@ class_name CharacterClass
 
 @export var class_id:     StringName = &""
 @export var display_name: String     = "Unbekannt"
+@export var faction_id: StringName = &"independent"
 @export_multiline var lore_text: String = ""
 ## Welche Geschlechts-Optionen für diese Klasse wählbar sind ("m","f","nb")
 @export var gender_options: Array[String] = ["m", "f"]

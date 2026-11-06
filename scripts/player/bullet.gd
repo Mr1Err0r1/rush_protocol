@@ -7,7 +7,7 @@ class_name Bullet
 
 func _ready() -> void:
 	# Selbstzerstörung nach life_time Sekunden
-	get_tree().create_timer(life_time).timeout.connect(funcref(self, "queue_free"))
+	get_tree().create_timer(life_time).timeout.connect(queue_free)
 
 func set_velocity(dir: Vector3, initial_speed: float=-1.0) -> void:
 	if initial_speed > 0.0:

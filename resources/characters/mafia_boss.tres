@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 class_id = &"mafia_boss"
+faction_id = &"mafia"
 display_name = "Mafia-Boss"
 lore_text = "Du hast Generationen aufgebaut, um diesen Moment vorzubereiten. Das Kasino soll deins werden — mit Bestechung, Einschüchterung oder dem Revolver. Alle kennen deinen Namen. Das ist dein Vorteil und dein Fluch."
 gender_options = ["m", "f"]

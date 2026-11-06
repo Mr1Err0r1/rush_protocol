@@ -1,5 +1,4 @@
 extends Node3D
-class_name MatchWorldSetup
 
 # Wires all subsystems on startup: loads configs from GameManager,
 # spawns player nodes, connects CharacterSelect → MatchController.
@@ -12,6 +11,7 @@ const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
 @onready var spawned_root:   Node3D            = $SpawnedPlayers
 @onready var match_hud:      MatchHUD          = $UILayer/MatchHUD
 @onready var char_select_ui: CharacterSelectUI = $CharacterSelectLayer/CharacterSelectUI
+@onready var casino_tower: CasinoTower = $CasinoTower
 
 var _seat_transforms: Array[Transform3D] = []
 var _spawned: Dictionary = {}   # player_id → PlayerController
@@ -19,6 +19,7 @@ var _spawned: Dictionary = {}   # player_id → PlayerController
 
 func _ready() -> void:
 	_collect_seats()
+	casino_tower.floor_changed.connect(_on_casino_floor_changed)
 
 	match_ctrl.initialize(
 		GameManager.pending_player_configs,
@@ -85,3 +86,10 @@ func _on_phase_changed(phase: String) -> void:
 		"CHARACTER_SELECT":
 			$CharacterSelectLayer.visible = true
 			match_hud.visible = false
+
+func _on_casino_floor_changed(body: Node3D, zone_id: String, _floor_name: String) -> void:
+	if match_ctrl == null or body == null:
+		return
+	var player_id := String(body.name).trim_prefix("Player_").to_int()
+	if player_id > 0:
+		match_ctrl.request_move_zone(player_id, zone_id)

@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 class_id = &"assassin"
+faction_id = &"assassins"
 display_name = "Assassine"
 lore_text = "Kein Name, kein Gesicht, kein Zögern. Du wurdest engagiert, einen Konkurrenten zu eliminieren. Oder alle. Je nach Auftrag. Das Kasino ist nur der Tatort."
 gender_options = ["m", "f", "nb"]

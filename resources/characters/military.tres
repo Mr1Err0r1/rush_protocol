@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"military"
+faction_id = &"military"
+display_name = "Militärischer Einsatzleiter"
+lore_text = "Du bist für eine diskrete Operation im Blackglass Casino. Deine Ausrüstung ist dienstlich, dein Auftrag geheim: Lies die Lage, sichere Beweise und entscheide, wem du vertraust."
+gender_options = ["m", "f", "nb"]
+start_health = 5
+start_suspicion = 0
+start_heat = 1
+start_influence = 3
+start_chips = 45
+smuggle_slots = 1
+guaranteed_items = [&"revolver"]
+allowed_item_categories = ["intel", "gadget", "tool"]
+detection_resistance = 0.15
+entry_bonus_id = &"bonus_service_clearance"
+passive_ability_id = &"passive_tactical_read"
+active_ability_id = &"active_secure_area"
+primary_objective = "secure_the_vault"
+unlocked_by_default = true

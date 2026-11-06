@@ -97,7 +97,7 @@ func _physics_process(delta: float) -> void:
 	velocity.x = lerp(velocity.x, dir.x * speed, acceleration * delta)
 	velocity.z = lerp(velocity.z, dir.z * speed, acceleration * delta)
 	# Explicit move_and_slide usage for clarity
-	velocity = move_and_slide(velocity, Vector3.UP)
+	move_and_slide()
 	update_head(delta)
 
 	# Update animations and handle attacks

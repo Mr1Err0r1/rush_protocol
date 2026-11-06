@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 class_id = &"government_agent"
+faction_id = &"government"
 display_name = "Regierungsagent"
 lore_text = "Offiziell: Urlaub. Inoffiziell: Mission. Du hast Befugnisse, die niemand hier kennt — und Methoden, die niemand kennen darf."
 gender_options = ["m", "f"]

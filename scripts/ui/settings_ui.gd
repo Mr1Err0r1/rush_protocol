@@ -708,7 +708,7 @@ func _ensure_colorblind_layer() -> void:
 	mat.set_shader_parameter("mode", 0)
 	_colorblind_rect.material = mat
 	_colorblind_layer.add_child(_colorblind_rect)
-	get_tree().root.add_child(_colorblind_layer)
+	get_tree().root.add_child.call_deferred(_colorblind_layer)
 
 
 func _apply_colorblind_filter() -> void:

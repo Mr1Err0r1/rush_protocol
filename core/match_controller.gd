@@ -120,9 +120,14 @@ func confirm_loadout(player_id: int, item_ids: Array[StringName]) -> bool:
 	for iid in item_ids:
 		if count >= max_slots:
 			break
-		if ItemDatabase.has_item(iid):
-			all_items.append(iid)
-			count += 1
+		var item_def := ItemDatabase.get_item(iid) as ItemDefinition
+		if item_def == null:
+			continue
+		if char_class != null and not char_class.allowed_item_categories.is_empty():
+			if not char_class.allowed_item_categories.has(item_def.category):
+				continue
+		all_items.append(iid)
+		count += 1
 
 	state.smuggled_items = all_items
 	for iid in all_items:
