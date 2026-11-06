@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  gdscript-parse:
+    name: GDScript parsen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install gdtoolkit==4.5.0
+      - name: Alle .gd-Dateien auf Syntaxfehler prüfen
+        run: find . -name '*.gd' -not -path './.godot/*' -print0 | xargs -0 gdparse
+
+  repo-hygiene:
+    name: Repo-Hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Keine Cache-/Temp-Dateien im Repo
+        run: |
+          bad=$(git ls-files | grep -E '^\.godot/|\.tmp$' || true)
+          if [ -n "$bad" ]; then echo "::error::Nicht committen:"; echo "$bad"; exit 1; fi
+      - name: Keine verwaisten .import-Dateien
+        run: |
+          fail=0
+          for f in $(git ls-files | grep '\.import$'); do
+            src=$(grep -m1 '^source_file=' "$f" | sed 's|source_file="res://||; s|"$||')
+            if [ -n "$src" ] && [ ! -e "$src" ]; then echo "::error file=$f::Quelldatei fehlt: $src"; fail=1; fi
+          done
+          exit $fail
