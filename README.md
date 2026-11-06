@@ -55,7 +55,7 @@ Der Risiko-Pool liefert Gewinne oder Verluste. Die gezinkten Karten (`fake_cards
 1. Godot **4.7** öffnen.
 2. Dieses Repository als Projekt importieren.
 3. `project.godot` starten; die Hauptszene ist das Hauptmenü.
-4. Solo-Spiel starten, Charakter auswählen und Loadout bestätigen.
+4. Solo-Spiel starten, zuerst eine Fraktion und danach Rolle, Geschlecht und Loadout auswählen.
 
 Headless-Import/Editorprüfung:
 
