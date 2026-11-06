@@ -2,6 +2,8 @@
 
 **Rush Protocol** ist ein taktisches 3D-Spiel in Godot 4.7: Schleuse Ausrüstung ins Casino, bluffe an den Spieltischen, verwalte Chips und Misstrauen und entscheide, ob du als Syndikat, Ermittler, Einsatzkraft oder unauffälliger Gast die Kontrolle übernimmst.
 
+Die vollständige Beschreibung von Spielschleife, Etagen, Rollenwerten, Fraktionen, Inventar, Items, Steuerung und aktuellem Entwicklungsstand steht in [GAME_OVERVIEW.md](GAME_OVERVIEW.md).
+
 > Alle Waffen, Schmuggelobjekte und Täuschungsaktionen sind fiktive Spielmechaniken. Das Spiel beschreibt keine realen Methoden.
 
 ## Das Spiel in Kürze
