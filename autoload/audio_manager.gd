@@ -4,10 +4,16 @@ extends Node
 ## EventBus.audio_play_sfx("key") und kümmern sich nicht um Nodes.
 
 const MUSIC_FADE_TIME := 1.2
+## Tracks, die nur einmal spielen (Stinger); alle anderen loopen.
+const NON_LOOPING_TRACKS: Array[String] = ["gameover"]
 
 var _sfx_players:  Array[AudioStreamPlayer] = []
 var _music_player: AudioStreamPlayer
 var _sfx_pool_size := 12
+
+var _music_tween:   Tween
+var _current_track: String = ""
+var _music_request: int = 0   # verwirft veraltete, noch wartende play_music()-Aufrufe
 
 # Laufzeit-Lautstärken (werden aus SaveManager geladen)
 var sfx_volume_db:   float = 0.0
@@ -81,28 +87,50 @@ func play_sfx(sound_key: String) -> void:
 func play_music(track_key: String) -> void:
 	if not MUSIC_MAP.has(track_key):
 		return
+	# Läuft der Track bereits, nicht neu starten (z. B. wiederholte Phasenwechsel).
+	if track_key == _current_track and _music_player.playing:
+		return
 	var path: String = MUSIC_MAP[track_key]
 	if not ResourceLoader.exists(path):
 		return
+	_music_request += 1
+	var request := _music_request
+	_current_track = track_key
+	_kill_music_tween()
 	if _music_player.playing:
-		# Fade-Out, dann fade-in — einfache Tween-Lösung
-		var tw := create_tween()
-		tw.tween_property(_music_player, "volume_db", -80.0, MUSIC_FADE_TIME * 0.5)
-		await tw.finished
-	_music_player.stream   = load(path)
+		_music_tween = create_tween()
+		_music_tween.tween_property(_music_player, "volume_db", -80.0, MUSIC_FADE_TIME * 0.5)
+		await get_tree().create_timer(MUSIC_FADE_TIME * 0.5).timeout
+		if request != _music_request:
+			return   # in der Zwischenzeit wurde ein anderer Track angefordert
+	var stream: AudioStream = load(path)
+	if stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = not (track_key in NON_LOOPING_TRACKS)
+	_music_player.stream    = stream
 	_music_player.volume_db = -80.0
 	_music_player.play()
-	var tw2 := create_tween()
-	tw2.tween_property(_music_player, "volume_db", music_volume_db, MUSIC_FADE_TIME * 0.5)
+	_kill_music_tween()
+	_music_tween = create_tween()
+	_music_tween.tween_property(_music_player, "volume_db", music_volume_db, MUSIC_FADE_TIME * 0.5)
 
 
 func stop_music() -> void:
 	if not _music_player.playing:
 		return
-	var tw := create_tween()
-	tw.tween_property(_music_player, "volume_db", -80.0, MUSIC_FADE_TIME)
-	await tw.finished
-	_music_player.stop()
+	_music_request += 1
+	var request := _music_request
+	_current_track = ""
+	_kill_music_tween()
+	_music_tween = create_tween()
+	_music_tween.tween_property(_music_player, "volume_db", -80.0, MUSIC_FADE_TIME)
+	await get_tree().create_timer(MUSIC_FADE_TIME).timeout
+	if request == _music_request:
+		_music_player.stop()
+
+
+func _kill_music_tween() -> void:
+	if _music_tween != null and _music_tween.is_valid():
+		_music_tween.kill()
 
 
 func set_sfx_volume(db: float) -> void:
@@ -113,6 +141,7 @@ func set_sfx_volume(db: float) -> void:
 
 func set_music_volume(db: float) -> void:
 	music_volume_db = db
+	_kill_music_tween()   # laufenden Fade nicht gegen den Slider arbeiten lassen
 	_music_player.volume_db = db
 	SaveManager.set_setting("music_volume", db)
 
