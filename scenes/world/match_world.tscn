@@ -1,12 +1,13 @@
-[gd_scene load_steps=14 format=3 uid="uid://np_matchworld_001"]
+[gd_scene load_steps=15 format=3 uid="uid://np_matchworld_001"]
 
-[ext_resource type="Script" path="res://scripts/core/match_controller.gd" id="1"]
-[ext_resource type="Script" path="res://scripts/core/risk_controller.gd" id="2"]
-[ext_resource type="Script" path="res://scripts/core/entry_phase_controller.gd" id="3"]
-[ext_resource type="Script" path="res://scripts/network/network_rpc_relay.gd" id="4"]
+[ext_resource type="Script" path="res://core/match_controller.gd" id="1"]
+[ext_resource type="Script" path="res://core/risk_controller.gd" id="2"]
+[ext_resource type="Script" path="res://core/entry_phase_controller.gd" id="3"]
+[ext_resource type="Script" path="res://network/network_rpc_relay.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/ui/match_hud.gd" id="5"]
 [ext_resource type="Script" path="res://scripts/ui/character_select_ui.gd" id="6"]
 [ext_resource type="Script" path="res://scenes/world/match_world_setup.gd" id="99"]
+[ext_resource type="Script" path="res://scripts/world/casino_tower.gd" id="101"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="100_pm"]
 
 [sub_resource type="BoxMesh" id="TableMesh_1"]
@@ -29,6 +30,9 @@ size = Vector3(20, 0.1, 20)
 
 [node name="MatchWorld" type="Node3D"]
 script = ExtResource("99")
+[node name="CasinoTower" type="Node3D" parent="."]
+script = ExtResource("101")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.707, -0.5, 0.5, 0, 0.707, 0.707, -0.707, -0.5, 0.5, 0, 6, 0)

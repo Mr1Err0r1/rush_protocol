@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 class_id = &"citizen"
+faction_id = &"civilian"
 display_name = "Normalbürger"
 lore_text = "Du solltest heute nicht hier sein. Kein Plan, keine Verbündeten, kein Budget. Nur du, dein Mut — und die Tatsache, dass dich niemand ernst nimmt. Das ist dein Vorteil."
 gender_options = ["m", "f", "nb"]

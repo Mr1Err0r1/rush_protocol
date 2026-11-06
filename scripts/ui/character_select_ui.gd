@@ -111,7 +111,7 @@ func _on_class_selected(index: int) -> void:
 
 func _show_class_info(cc: CharacterClass) -> void:
 	class_name_lbl.text = cc.display_name
-	class_lore_lbl.text = cc.lore_text
+	class_lore_lbl.text = "Fraktion: %s\n\n%s" % [_faction_label(cc.faction_id), cc.lore_text]
 	smuggle_label.text  = "Schmuggel-Slots: %d" % cc.smuggle_slots
 
 	# Stats in GridContainer darstellen
@@ -156,10 +156,13 @@ func _populate_loadout_slots(cc: CharacterClass) -> void:
 		_selected_items.append(&"")
 
 
-func _open_item_picker(slot_index: int, slot_btn: Button, _cc: CharacterClass) -> void:
+func _open_item_picker(slot_index: int, slot_btn: Button, cc: CharacterClass) -> void:
 	## In einem vollständigen Projekt würde hier ein modales Popup-Menü öffnen.
 	## Für dieses Gerüst: zyklisch durch verfügbare Items rotieren.
-	var smuggleable := ItemDatabase.get_smuggleable_items()
+	var smuggleable: Array = []
+	for item in ItemDatabase.get_smuggleable_items():
+		if cc.allowed_item_categories.is_empty() or cc.allowed_item_categories.has(item.category):
+			smuggleable.append(item)
 	if smuggleable.is_empty():
 		return
 	var current_id: StringName = _selected_items[slot_index]
@@ -202,3 +205,14 @@ func _on_confirm_pressed() -> void:
 	elif GameManager.active_match != null:
 		GameManager.active_match.select_character(_local_player_id, _selected_class_id, _selected_gender)
 		GameManager.active_match.confirm_loadout(_local_player_id, items)
+
+func _faction_label(faction_id: StringName) -> String:
+	match faction_id:
+		&"mafia": return "Mafia"
+		&"military": return "Militär"
+		&"civilian": return "Zivilisten"
+		&"assassins": return "Assassinen-Gilde"
+		&"government": return "Regierung"
+		&"law_enforcement": return "Ermittler"
+		&"elite": return "Casino-Elite"
+		_: return "Unabhängig"

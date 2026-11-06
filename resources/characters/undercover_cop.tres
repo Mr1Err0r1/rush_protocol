@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 class_id = &"undercover_cop"
+faction_id = &"law_enforcement"
 display_name = "Verdeckter Ermittler"
 lore_text = "Du bist hier um Beweise zu sammeln, nicht um zu spielen. Aber manchmal muss man mitspielen, um das Spiel zu stoppen. Deine Dienstwaffe ist dein Geheimnis."
 gender_options = ["m", "f"]
