@@ -1,6 +1,6 @@
 WICHTIG: Füge in den Godot-Projekteinstellungen (Project Settings -> Autoload) folgende Scripts hinzu:
 
-1. LocaleManager -> res://scripts/autoload/locale_manager.gd
+1. LocaleManager -> res://autoload/locale_manager.gd (bereits in project.godot registriert)
 2. (Sicherstellen, dass SaveManager, EventBus, GameManager etc. bereits drin sind)
 
 Änderungen in dieser Version:
