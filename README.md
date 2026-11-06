@@ -15,6 +15,7 @@ English is the canonical project documentation. The German and Russian pages are
 ## What is in the prototype
 
 - A five-floor casino-tower environment, assembled from Godot 3D geometry at runtime, with themed floors and elevator areas.
+- A faction-first character wizard that filters the role list to the chosen faction and remembers the last selected role.
 - Character resources representing the Mafia, Assassins' Guild, civilians, military, government/investigators and casino elite.
 - Character-specific starting stats, guaranteed equipment and smuggling/loadout rules.
 - A fictional entry inspection, suspicion and heat systems, player inventory, chips, risk actions and a range of gadgets and weapons.
@@ -32,7 +33,7 @@ git clone https://github.com/Mr1Err0r1/rush_protocol.git
 cd rush_protocol
 ```
 
-Import and open `project.godot` in Godot, then run the project. The main scene opens the main menu. Use the solo flow to start a local prototype match; available menu paths can change as development continues.
+Import and open `project.godot` in Godot, then run the project. The main scene opens the main menu. In the solo flow, choose a faction first and then select a role from that faction before customizing gender and loadout; available menu paths can change as development continues.
 
 For a headless editor import check (requires the Godot executable on `PATH`):
 
@@ -88,7 +89,7 @@ Please open an issue before large or cross-cutting changes. Keep changes focused
 
 ## Releases
 
-There is **no stable or production release yet**. The repository is in active prototype development. A release should wait until the core table-game loop, faction/character onboarding, key gameplay flows, platform testing, licensing and a reproducible build have been reviewed. Do not treat the current `main` branch as a finished game or a release build.
+There is **no stable or production release yet**. The repository is in active prototype development. The faction-first selection flow is now implemented but still needs interactive QA. A release should wait until the core table-game loop, key gameplay flows, platform testing, licensing and a reproducible build have been reviewed. Do not treat the current `main` branch as a finished game or a release build.
 
 ## License
 

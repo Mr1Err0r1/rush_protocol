@@ -31,6 +31,7 @@ run_case() {
 run_case editor-import --editor --quit
 run_case main-menu --quit-after 5
 run_case pause-transitions --script res://scripts/test/test_pause_transitions.gd
+run_case faction-first-onboarding res://scripts/test/test_character_onboarding.tscn --quit-after 12
 
 while IFS= read -r scene; do
   relative="${scene#"$ROOT"/}"

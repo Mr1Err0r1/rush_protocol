@@ -15,6 +15,7 @@ Englisch ist die maßgebliche Projektdokumentation. Die deutsche und russische F
 ## Was der Prototyp enthält
 
 - Eine fünfstöckige Casino-Turmwelt, die zur Laufzeit aus Godot-3D-Geometrie aufgebaut wird, mit thematischen Etagen und Liftbereichen.
+- Einen Fraktion-zuerst-Charakterassistenten, der Rollen nach der gewählten Fraktion filtert und die zuletzt gewählte Rolle merkt.
 - Charakterressourcen für Mafia, Assassinen-Gilde, Zivilisten, Militär, Regierung/Ermittler und Casino-Elite.
 - Rollenabhängige Startwerte, garantierte Ausrüstung sowie Schmuggel- und Loadout-Regeln.
 - Eine fiktive Einlasskontrolle, Misstrauen und Heat, Spielerinventar, Chips, Risikoaktionen und verschiedene Gadgets und Waffen.
@@ -32,7 +33,7 @@ git clone https://github.com/Mr1Err0r1/rush_protocol.git
 cd rush_protocol
 ```
 
-Importiere und öffne `project.godot` in Godot und starte das Projekt. Die Hauptszene öffnet das Hauptmenü. Über den Solo-Ablauf kannst du eine lokale Prototyp-Partie beginnen; die verfügbaren Menüpfade können sich während der Entwicklung ändern.
+Importiere und öffne `project.godot` in Godot und starte das Projekt. Die Hauptszene öffnet das Hauptmenü. Im Solo-Ablauf wählst du zuerst eine Fraktion und danach eine Rolle dieser Fraktion, bevor du Geschlecht und Loadout anpasst; die Menüpfade können sich während der Entwicklung ändern.
 
 Für einen headless Editor-Import (Godot muss im `PATH` liegen):
 
@@ -40,7 +41,7 @@ Für einen headless Editor-Import (Godot muss im `PATH` liegen):
 godot --headless --editor --path . --quit
 ```
 
-Dieser Importtest ersetzt weder einen vollständigen interaktiven Spieletest noch eine audiovisuelle Qualitätsprüfung. Ein wiederverwendbares automatisiertes Szenen-Smoke-Testskript ist in [PR #11](https://github.com/Mr1Err0r1/rush_protocol/pull/11) vorgeschlagen und noch nicht Teil von `main`.
+Dieser Importtest ersetzt weder einen vollständigen interaktiven Spieletest noch eine audiovisuelle Qualitätsprüfung. Das automatisierte Smoke-Testskript `scripts/test/run_headless_smoke.sh` prüft den Szenenstart und Engine-Fehler, ersetzt aber keine Spiel- oder Audio/Video-QA.
 
 ## Steuerung
 
@@ -82,7 +83,7 @@ Bitte eröffne vor größeren oder bereichsübergreifenden Änderungen ein Issue
 
 ## Releases
 
-Es gibt **noch kein stabiles oder produktives Release**. Das Repository befindet sich in aktiver Prototypentwicklung. Vor einem Release sollten der Kernspielablauf an den Tischen, Fraktions-/Charakter-Onboarding, zentrale Gameplay-Flows, Plattformtests, Lizenzfrage und reproduzierbarer Build geprüft sein. Der aktuelle Branch `main` ist kein fertiges Spiel und kein Release-Build.
+Es gibt **noch kein stabiles oder produktives Release**. Das Repository befindet sich in aktiver Prototypentwicklung. Die Fraktion-zuerst-Auswahl ist implementiert, benötigt aber noch interaktive QA. Vor einem Release sollten der Kernspielablauf an den Tischen, zentrale Gameplay-Flows, Plattformtests, Lizenzfrage und reproduzierbarer Build geprüft sein. Der aktuelle Branch `main` ist kein fertiges Spiel und kein Release-Build.
 
 ## Lizenz
 

@@ -16,7 +16,7 @@ The intended tone is a social heist thriller: Mafia, military, Assassins, invest
 ## 2. Current prototype loop
 
 1. **Start and mode:** The main menu exposes solo-versus-AI, lobby/network and local match configuration entry points. Some flows remain under development.
-2. **Character role:** Each player selects a `CharacterClass`. A role resource defines faction, starting statistics, smuggling slots, guaranteed equipment, permitted loadout categories and a narrative objective.
+2. **Faction-first role selection:** Players choose a faction before the role screen opens; the list then shows only available roles from that faction. The last selected role preselects its faction on a later visit. A role resource defines starting statistics, smuggling slots, guaranteed equipment, permitted loadout categories and a narrative objective.
 3. **Loadout:** Guaranteed role items are added separately from selectable slots. Optional items must be eligible for smuggling and comply with role restrictions. Validation exists in both the selection UI and match logic.
 4. **Entry check:** Non-guaranteed items may be detected according to their discovery chance. Suspicion affects the check; discovered items may be confiscated. Excess suspicion can result in ejection.
 5. **Casino turns:** The match controller tracks phases such as item use, action and resolution. Risk actions can alter chips and can be affected by selected items.
@@ -39,7 +39,7 @@ The match scene builds a vertical casino tower at runtime from Godot 3D geometry
 
 ## 4. Factions and character roles
 
-Characters are data resources under `resources/characters/`. Starting values include health, suspicion, heat, influence and chips. Smuggling slots apply to selected items; guaranteed role equipment is tracked separately and bypasses the ordinary entry check.
+Characters are data resources under `resources/characters/`. The selection wizard filters roles by faction and provides localized English, German and Russian onboarding labels. Starting values include health, suspicion, heat, influence and chips. Smuggling slots apply to selected items; guaranteed role equipment is tracked separately and bypasses the ordinary entry check.
 
 | Role | Faction | Health | Suspicion | Heat | Influence | Chips | Slots | Guaranteed item(s) |
 |---|---|---:|---:|---:|---:|---:|---:|---|
