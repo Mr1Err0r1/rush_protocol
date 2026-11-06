@@ -17,14 +17,15 @@ const BINDABLE: Array = [
 	{ "action": "move_right",      "label": "Rechts" },
 	{ "action": "jump",            "label": "Springen" },
 	{ "action": "sprint",          "label": "Sprinten" },
-	{ "action": "interact",        "label": "Interagieren  (E)" },
-	{ "action": "primary_action",  "label": "Hauptaktion" },
-	{ "action": "secondary_action","label": "Sekundäraktion" },
-	{ "action": "end_turn",        "label": "Zug beenden" },
-	{ "action": "toggle_target",   "label": "Ziel wechseln" },
-	{ "action": "use_item_1",      "label": "Item 1" },
-	{ "action": "use_item_2",      "label": "Item 2" },
-	{ "action": "use_item_3",      "label": "Item 3" },
+		{ "action": "interact",        "label": "Interagieren  (E)" },
+		{ "action": "primary_action",  "label": "Hauptaktion" },
+		{ "action": "secondary_action","label": "Sekundäraktion" },
+		{ "action": "end_turn",        "label": "Zug beenden" },
+		{ "action": "toggle_target",   "label": "Ziel wechseln" },
+		{ "action": "pause",            "label": "Pause-Menü" },
+		{ "action": "use_item_1",      "label": "Item 1" },
+		{ "action": "use_item_2",      "label": "Item 2" },
+		{ "action": "use_item_3",      "label": "Item 3" },
 	{ "action": "use_item_4",      "label": "Item 4" },
 ]
 
@@ -158,10 +159,10 @@ func _apply_rebind(event: InputEvent) -> void:
 	_rebinding  = ""
 	_rebind_btn = null
 
-	# ESC = Abbrechen (ESC selbst bleibt nicht bindbar)
+	# ESC bricht Rebinding ab, außer wenn gerade die Pause-Taste gebunden wird.
 	if event is InputEventKey:
 		var kc: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
-		if kc == KEY_ESCAPE:
+		if kc == KEY_ESCAPE and action != "pause":
 			_reset_btn_style(btn, action)
 			return
 
