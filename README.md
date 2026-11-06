@@ -62,6 +62,7 @@ Headless-Import/Editorprüfung:
 ```bash
 godot --headless --editor --path . --quit
 godot --headless --path . --quit-after 10
+scripts/test/run_headless_smoke.sh
 ```
 
 ## Projektstruktur
