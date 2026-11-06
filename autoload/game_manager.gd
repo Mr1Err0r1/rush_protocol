@@ -23,6 +23,27 @@ var active_match: Node = null   # MatchController
 
 # Statistiken der laufenden Partie (für End-Screen).
 var match_stats: Dictionary = {}
+var paused_from_state: AppState = AppState.MATCH
+var mouse_mode_before_pause: Input.MouseMode = Input.MOUSE_MODE_CAPTURED
+
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
+
+func _input(event: InputEvent) -> void:
+	if not event.is_action_pressed("pause"):
+		return
+	if event is InputEventKey and event.echo:
+		return
+
+	match app_state:
+		AppState.MATCH, AppState.GAME_OVER:
+			toggle_pause()
+			get_viewport().set_input_as_handled()
+		AppState.LOBBY:
+			return_to_menu()
+			get_viewport().set_input_as_handled()
 
 # ── Öffentliche API ───────────────────────────────────────────────────────────
 
@@ -59,18 +80,22 @@ func go_to_lobby() -> void:
 func return_to_menu() -> void:
 	active_match = null
 	get_tree().paused = false  # BUGFIX: vor Szenenwechsel entpausieren
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	NetworkManager.disconnect_session()
 	_change_to(SCENE_MAIN_MENU, AppState.MENU)
 
 
 func toggle_pause() -> void:
-	if app_state == AppState.MATCH:
+	if app_state == AppState.MATCH or app_state == AppState.GAME_OVER:
+		paused_from_state = app_state
+		mouse_mode_before_pause = Input.mouse_mode
 		app_state = AppState.PAUSED
 		get_tree().paused = true
 		EventBus.ui_open_pause.emit()
 	elif app_state == AppState.PAUSED:
-		app_state = AppState.MATCH
+		app_state = paused_from_state
 		get_tree().paused = false
+		Input.mouse_mode = mouse_mode_before_pause
 		EventBus.ui_close_pause.emit()
 
 
