@@ -28,6 +28,7 @@ const C_DIVIDER    := Color(0.40, 0.28, 0.06, 0.55)
 var _page_main: Control = null
 var _page_ctrl: Control = null
 var _kbp:       KeyBindingsPanel = null   # KeyBindingsPanel-Instanz
+var _online_notice: Label = null
 
 # ── Styles ────────────────────────────────────────────────────────────────────
 var _sty_panel: StyleBoxFlat
@@ -51,12 +52,12 @@ func _ready() -> void:
 func _open() -> void:
 	visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_online_notice.visible = GameManager.is_online()
 	_show_main()
 
 
 func _close() -> void:
 	visible = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
 # ── Input ─────────────────────────────────────────────────────────────────────
@@ -67,14 +68,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	# KeyBindingsPanel konsumiert Events selbst wenn rebinding aktiv ist
 	if _kbp != null and _kbp.is_rebinding():
 		return
-	if event is InputEventKey and event.pressed:
-		var kc: int = event.keycode if event.physical_keycode == 0 else event.physical_keycode
-		if kc == KEY_ESCAPE:
-			if _page_ctrl != null and _page_ctrl.visible:
-				_show_main()
-			else:
-				_on_resume()
-			get_viewport().set_input_as_handled()
+	if event.is_action_pressed("pause"):
+		if _page_ctrl != null and _page_ctrl.visible:
+			_show_main()
+		else:
+			_on_resume()
+		get_viewport().set_input_as_handled()
 
 
 # ── UI-Aufbau ─────────────────────────────────────────────────────────────────
@@ -110,6 +109,14 @@ func _build_ui() -> void:
 	title.add_theme_color_override("font_color", C_TITLE)
 	vbox.add_child(title)
 	vbox.add_child(_divider(10, 16))
+	_online_notice = Label.new()
+	_online_notice.text = "Dein Client ist lokal pausiert; die Online-Partie läuft für andere weiter."
+	_online_notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_online_notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_online_notice.add_theme_font_size_override("font_size", 13)
+	_online_notice.add_theme_color_override("font_color", C_TEXT_DIM)
+	_online_notice.visible = false
+	vbox.add_child(_online_notice)
 
 	# Hauptseite
 	_page_main = _build_main_page()
