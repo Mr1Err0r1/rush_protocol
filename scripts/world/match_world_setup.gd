@@ -12,6 +12,7 @@ const PLAYER_SCENE := preload("res://scenes/player/player.tscn")
 @onready var spawned_root:   Node3D            = $SpawnedPlayers
 @onready var match_hud:      MatchHUD          = $UILayer/MatchHUD
 @onready var char_select_ui: CharacterSelectUI = $CharacterSelectLayer/CharacterSelectUI
+@onready var casino_tower:   CasinoTower       = $CasinoTower
 
 var _seat_transforms: Array[Transform3D] = []
 var _spawned: Dictionary = {}   # player_id → PlayerController
@@ -30,6 +31,9 @@ func _ready() -> void:
 	# Vor initialize() verbinden, falls MatchController die erste Phase
 	# synchron innerhalb von initialize() feuert.
 	EventBus.phase_changed.connect(_on_phase_changed)
+
+	# Aufzuege fragen vor dem Teleport beim MatchController nach (stuck, eliminiert ...).
+	casino_tower.travel_validator = _try_casino_floor_move
 
 	match_ctrl.initialize(
 		GameManager.pending_player_configs,
@@ -128,3 +132,12 @@ func _play_loading_transition() -> void:
 	await tw_out.finished
 
 	layer.queue_free()
+
+
+func _try_casino_floor_move(body: Node3D, zone_id: String) -> bool:
+	if match_ctrl == null or body == null:
+		return false
+	var player_id := String(body.name).trim_prefix("Player_").to_int()
+	if player_id <= 0:
+		return false
+	return match_ctrl.request_move_zone(player_id, zone_id)
