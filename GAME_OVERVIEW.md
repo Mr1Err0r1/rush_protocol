@@ -1,121 +1,105 @@
-# Rush Protocol — vollständige Spielübersicht
+# Rush Protocol — Game Overview
 
-**Projektname im Godot-Startfenster:** `Rush_Protocol`
-**Setting dieser Ausbaustufe:** Blackglass Casino
-**Engine:** Godot 4.7
-**Genre:** taktisches 3D-Mehrspieler-/Solo-Spiel mit Rollenauswahl, Casino-Risikoaktionen, Schmuggel, Inventar und verdeckten Zielen
+**Languages:** English (canonical) · [Deutsch](GAME_OVERVIEW.de.md) · [Русский](GAME_OVERVIEW.ru.md)
 
-## 1. Spielidee
+**Project title in Godot:** `Rush_Protocol`\
+**Setting:** Blackglass Casino\
+**Engine:** Godot 4.7\
+**Genre:** Tactical 3D multiplayer/solo prototype with character roles, casino risk actions, smuggling, inventory and hidden objectives
 
-Die Spieler betreten ein luxuriöses Casino, in dem verschiedene Gruppen um Geld, Informationen und die Kontrolle über das Haus konkurrieren. Vor dem Einlass wird eine Rolle ausgewählt und ein begrenztes Loadout zusammengestellt. Die Sicherheitskontrolle kann nicht garantierte Schmuggel-Items entdecken und beschlagnahmen. Wer hineinkommt, versucht mit Chips, Ausrüstung, Einfluss und taktischen Entscheidungen weiter in das Gebäude vorzudringen, ohne dass Misstrauen und Aufmerksamkeit zu hoch werden.
+## 1. Game premise
 
-Die zentrale Fantasie ist ein sozialer Heist-Thriller: Mafia, Militär, Assassinen, Ermittler, Casino-Elite und unauffällige Gäste verfolgen unterschiedliche Rollen. Pokerbetrug, Bestechung, falsche Identitäten und Waffen sind **rein fiktive Spielmechaniken**. Das Projekt gibt keine Anleitung zu realem Betrug, Schmuggel oder Gewalt.
+Players enter a luxury casino where competing groups seek money, information and control of the house. Before entering, each player chooses a role and assembles a limited loadout. A fictional security check may discover and confiscate non-guaranteed contraband. Inside, players manage chips, equipment, influence and suspicion while trying to advance through the building.
 
-## 2. Spielablauf im aktuellen Prototyp
+The intended tone is a social heist thriller: Mafia, military, Assassins, investigators, casino elites and ordinary guests pursue different role fantasies. Poker cheating, bribery, false identities and weapons are **fictional game mechanics**. The project is not a guide to real-world fraud, smuggling or violence.
 
-1. **Spielstart und Modus:** Das Projekt hat Hauptmenü-Einstiegspunkte für Solo gegen KI, Lobby/Netzwerk und weitere lokale Match-Konfiguration.
-2. **Charakterwahl:** Jeder Spieler wählt eine `CharacterClass`. Die Rolle legt Startwerte, Fraktion, Schmuggel-Slots, Startausrüstung, mögliche Loadout-Kategorien und ein narratives Ziel fest.
-3. **Loadout:** Garantierte Rollen-Items kommen zusätzlich zu den wählbaren Slots ins Inventar. Wählbare Items müssen schmuggelbar sein und die erlaubten Kategorien der Rolle erfüllen. Die Prüfung geschieht in der UI und erneut in der Match-Logik.
-4. **Einlasskontrolle:** Nicht garantierte Items werden anhand ihrer Entdeckungswahrscheinlichkeit kontrolliert. Misstrauen beeinflusst das Risiko; entdeckte Items können beschlagnahmt werden. Zu viel Misstrauen oder mehrere entdeckte Gegenstände ohne Bestechung können zum Rauswurf führen.
-5. **Casino-Runden:** Runden besitzen die Zugphasen **Item**, **Aktion** und **Auflösung**. Items werden im Item-Schritt benutzt. In der Aktionsphase kann der aktuelle Risiko-Pool gezogen werden. Er verändert Chips und kann durch bestimmte Items beeinflusst werden.
-6. **Vordringen und Ziele:** Der Match-Controller führt Spielerzonen, Status-Effekte, Chips, Gesundheit, Misstrauen, Heat, Items und Eliminierung. Der letzte nicht ausgeschiedene Spieler kann gewinnen; ein Vault-Ziel kann ebenfalls das Match beenden.
-7. **Boss-Ebene:** Das Betreten der Penthouse-Zone löst derzeit das Signal für eine Bossbegegnung aus. Der Match-Controller enthält außerdem Boss-Gesundheit und eine Angriffs-/Siegfunktion. Eine ausgearbeitete Boss-Arena, Boss-UI und vollständige Fraktionsquest-Kette sind noch nicht fertig.
+## 2. Current prototype loop
 
-## 3. Casino-Welt und Etagen
+1. **Start and mode:** The main menu exposes solo-versus-AI, lobby/network and local match configuration entry points. Some flows remain under development.
+2. **Character role:** Each player selects a `CharacterClass`. A role resource defines faction, starting statistics, smuggling slots, guaranteed equipment, permitted loadout categories and a narrative objective.
+3. **Loadout:** Guaranteed role items are added separately from selectable slots. Optional items must be eligible for smuggling and comply with role restrictions. Validation exists in both the selection UI and match logic.
+4. **Entry check:** Non-guaranteed items may be detected according to their discovery chance. Suspicion affects the check; discovered items may be confiscated. Excess suspicion can result in ejection.
+5. **Casino turns:** The match controller tracks phases such as item use, action and resolution. Risk actions can alter chips and can be affected by selected items.
+6. **Progress and objectives:** Match state tracks players, zones, status effects, chips, health, suspicion, heat, inventory and elimination. Last-player-standing and vault-related win logic exist in the prototype.
+7. **Penthouse / boss signal:** Entering the penthouse zone can signal a boss encounter. Boss health and attack/win hooks are present, but the full encounter is unfinished.
 
-Die Match-Szene baut zur Laufzeit einen vertikalen Casino-Turm aus Godot-3D-Geometrie auf. Jede Ebene hat eine farblich eigene Gestaltung, leuchtendes Etagen-Schild, Säulen, Geländer und Spieltische. Liftflächen bringen den Spieler beim Betreten zum Mittelpunkt der Nachbaretage; der Match-Zustand erhält dabei die passende Zone.
+## 3. Casino tower
 
-| Ebene | Ort | Zone-ID | Rolle im Spielstand |
+The match scene builds a vertical casino tower at runtime from Godot 3D geometry. Floors have distinct visual themes, signs, columns, railings and tables. Elevator areas move a player between neighboring floors and update the associated zone state.
+
+| Floor | Location | Zone ID | Current role |
 |---|---|---|---|
-| 1 | Spielhalle und öffentliche Tische | `lobby` | Einstieg und Casino-Flair |
-| 2 | Goldener Salon / VIP | `vip_lounge` | gehobene Tische und High-Roller-Stimmung |
-| 3 | Hinterzimmer / Schwarzmarkt | `backroom` | narrativer Bereich für diskrete Deals |
-| 4 | Tresor-Korridor | `vault_corridor` | Übergang in die Hochsicherheitszone |
-| 5 | Penthouse des Hausherrn | `boss_office` | löst die Bossbegegnungs-Phase aus |
+| 1 | Gaming hall and public tables | `lobby` | Entry area and casino setting |
+| 2 | Golden salon / VIP | `vip_lounge` | High-roller atmosphere |
+| 3 | Backroom / black market | `backroom` | Narrative space for discreet deals |
+| 4 | Vault corridor | `vault_corridor` | Transition toward a secured area |
+| 5 | Owner's penthouse | `boss_office` | Signals the boss phase |
 
-**Wichtig zum aktuellen Stand:** Die Etagen sind im Spiel aufgebaut und die Aufzüge funktionieren als automatische Liftflächen. Zugangsschlüssel, gesperrte Türen, Händler-NPCs und unterschiedliche Regeln pro Etage sind noch nicht vollständig mit der Turm-Geometrie verbunden. Die Zone `vault_corridor` ist aktuell von der Match-Logikzone `vault` unterschieden.
+**Limitations:** The floors and elevator areas exist in the prototype. Key-gated doors, merchants, fully distinct rules per floor and a complete security progression are not yet integrated. `vault_corridor` and the match-logic zone `vault` are separate identifiers.
 
-## 4. Fraktionen und spielbare Rollen
+## 4. Factions and character roles
 
-Die Charaktere liegen als Datenressourcen unter `resources/characters/`. Gesundheit, Misstrauen, Heat, Einfluss und Chips sind Startwerte. Schmuggel-Slots zählen nur für frei gewählte Items; garantierte Items werden zusätzlich geführt und bei der Einlasskontrolle übersprungen.
+Characters are data resources under `resources/characters/`. Starting values include health, suspicion, heat, influence and chips. Smuggling slots apply to selected items; guaranteed role equipment is tracked separately and bypasses the ordinary entry check.
 
-| Rolle | Fraktion | Leben | Start-Misstrauen | Heat | Einfluss | Chips | Slots | Garantiertes Item | Erlaubte Loadout-Kategorien |
-|---|---|---:|---:|---:|---:|---:|---:|---|---|
-| Assassine | Assassinen-Gilde | 3 | 0 | 0 | 2 | 50 | 3 | Gift-Nadel | weapon, gadget, intel |
-| Normalbürger | Zivilisten | 5 | 0 | 0 | 1 | 30 | 1 | — | alle schmuggelbaren Kategorien |
-| Regierungsagent | Regierung | 3 | 0 | 1 | 4 | 60 | 2 | Fake-ID, Abhörwanze | intel, gadget, weapon, tool |
-| Mafia-Boss | Mafia | 4 | 1 | 3 | 4 | 80 | 2 | Revolver | alle schmuggelbaren Kategorien |
-| Militärischer Einsatzleiter | Militär | 5 | 0 | 1 | 3 | 45 | 1 | Revolver | intel, gadget, tool |
-| Millionär | Casino-Elite | 3 | 2 | 2 | 5 | 150 | 2 | Falschmünze / Fake-Chip | chip, tool, disguise |
-| Verdeckter Ermittler | Ermittler | 3 | 0 | 0 | 3 | 40 | 1 | KI-Linse | intel, gadget, tool |
+| Role | Faction | Health | Suspicion | Heat | Influence | Chips | Slots | Guaranteed item(s) |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| Assassin | Assassins' Guild | 3 | 0 | 0 | 2 | 50 | 3 | Poison needle |
+| Civilian | Civilians | 5 | 0 | 0 | 1 | 30 | 1 | — |
+| Government agent | Government | 3 | 0 | 1 | 4 | 60 | 2 | Fake ID, listening bug |
+| Mafia boss | Mafia | 4 | 1 | 3 | 4 | 80 | 2 | Revolver |
+| Military field leader | Military | 5 | 0 | 1 | 3 | 45 | 1 | Revolver |
+| Millionaire | Casino elite | 3 | 2 | 2 | 5 | 150 | 2 | Fake coin / chip |
+| Undercover investigator | Investigators | 3 | 0 | 0 | 3 | 40 | 1 | AI lens |
 
-Fähigkeits- und Ziel-IDs sind bereits in vielen Charakterressourcen hinterlegt (zum Beispiel `passive_fear_aura`, `active_mob_call`, `eliminate_rivals` oder `expose_criminals`). Die vollständige Ausführung dieser Rollenfähigkeiten ist ein offener Entwicklungsschritt, der in [Issue #4](https://github.com/Mr1Err0r1/rush_protocol/issues/4) festgehalten ist.
+Character resources also contain ability and objective IDs (for example, `passive_fear_aura`, `active_mob_call`, `eliminate_rivals` and `expose_criminals`). Not every listed ability has a complete gameplay implementation; faction abilities and the boss arc remain development work tracked in [issue #4](https://github.com/Mr1Err0r1/rush_protocol/issues/4).
 
-## 5. Inventar und Items
+## 5. Inventory and items
 
-Itemdaten liegen als `ItemDefinition`-Ressourcen unter `resources/items/`; das Spiel lädt derzeit zwölf Item-Ressourcen. Kategorien und Entdeckungswerte beeinflussen die Loadout-Auswahl und Einlasskontrolle. Die Beschreibung eines Gegenstandes ist seine fiktionale Spielrolle; nicht jedes Item besitzt bereits einen vollständig polierten UI-Effekt.
+Item definitions are Godot resources under `resources/items/`. The current set includes information tools, defensive items, fake chips, prepared cards, disguises, gadgets, weapons and a copied vault key. Their descriptions express intended fictional roles; not every item has a polished effect or UI feedback.
 
-| Item | Kategorie | Spielidee |
-|---|---|---|
-| KI-Linse (Stift-Kamera) | intel | verdeckte Beobachtung / Information |
-| Kugelsicheres Schutzband | tool | einmaliger Schutz gegen Schaden |
-| Falschmünze / Fake-Chip | chip | riskantes Spielen, Bestechung oder Ablenkung |
-| Präparierte Karten | tool | manipuliert im aktuellen System das nächste Risiko-Ergebnis; Pokerregeln selbst fehlen noch |
-| Gefälschter Ausweis | disguise | reduziert in der Datenbeschreibung Verdacht bzw. eröffnet eine VIP-Tarnung |
-| Superkleberpatrone | tool | fiktionale Sabotage/Ablenkung |
-| Feuerzeug | gadget | Ablenkung und Bereichseffekt |
-| Abhörwanze | intel | Information über ein Ziel für begrenzte Runden |
-| Gift-Nadel | weapon | fiktionaler, über mehrere Runden wirkender Effekt |
-| Revolver | weapon | laute Schadensaktion; erzeugt zusätzlich Aufmerksamkeit |
-| Mini-Rauchgranate | gadget | Rauch-/Ablenkungsaktion |
-| Vault-Schlüssel (Kopie) | tool | Zugangswerkzeug als Risiko-Item |
+The risk pool is an abstract casino action with positive and negative outcomes that affect chips. Prepared cards can force a favorable risk result. This is **not** a full poker or blackjack implementation: there are no complete private hands, betting rounds, fold/call/raise rules, dealer/opponent logic or authoritative table-game resolution yet. Full playable card tables and balanced cheating counterplay are tracked in [issue #2](https://github.com/Mr1Err0r1/rush_protocol/issues/2).
 
-Im zentralen Risiko-Pool sind standardmäßig vier positive und sechs negative Ergebnisse vorgesehen. Positive Ziehungen gewähren Chips, negative Ziehungen kosten Chips. Die präparierten Karten können ein positives Ergebnis erzwingen; ein erzwungenes Ergebnis wird vom Risiko-Controller gekennzeichnet. Das ist gegenwärtig eine abstrahierte Casino-Betrugsmechanik und **keine** vollständige Poker- oder Blackjack-Simulation.
+## 6. Controls
 
-Ein vollständiges Kartenspiel mit privaten Händen, Setzrunden, Fold/Call/Raise, Dealer-/Gegnerlogik und serverautoritativer Auflösung ist als [Issue #2](https://github.com/Mr1Err0r1/rush_protocol/issues/2) dokumentiert.
-
-## 6. Steuerung
-
-| Taste | Aktion im Prototyp |
+| Input | Prototype action |
 |---|---|
-| W / A / S / D | Bewegung |
-| Maus | Blick/Kamera |
-| Shift | Sprint |
-| Leertaste | Springen |
-| V | Angriffs-/Projektileingabe im Charaktercontroller-Prototyp |
-| 1–4 | jeweiliges Hotbar-Item benutzen |
-| Linksklick | Risiko-Aktion |
-| T | Zielspieler wechseln |
-| Enter | Zug beenden |
-| F5 | Kameraansicht wechseln |
-| Esc | Pause |
-| E | reservierte Interaktionstaste; Casino-Aufzüge lösen derzeit beim Betreten der Liftfläche aus |
+| `W` / `A` / `S` / `D` | Move |
+| Mouse | Look / camera |
+| `Shift` | Sprint |
+| `Space` | Jump |
+| `1`–`4` | Use the corresponding hotbar item |
+| Left mouse button | Risk action, where available |
+| `T` | Select target player |
+| `Enter` | End turn |
+| `V` | Prototype attack input |
+| `F5` | Change camera mode |
+| `Esc` | Pause / back, depending on current screen |
+| `E` | Reserved interaction input; elevator areas currently trigger on entry |
 
-Die konkrete Verfügbarkeit einer Aktion hängt von Matchphase, aktivem Spieler und vorhandener Ausrüstung ab.
+Available actions depend on the active player, match phase and equipped items. Bindings and menu behavior may change while the prototype is being developed.
 
-## 7. Projektaufbau
+## 7. Project structure
 
-- `project.godot` — Godot-Projekteinstellungen, Eingaben und Autoloads.
-- `autoload/` — Event-Bus, Match-/Save-/Audio-/Locale-/Item-Manager.
-- `core/` — Charakter-, Spieler-, Risiko-, Match- und Einlasslogik.
-- `resources/characters/` — Fraktionen, Startwerte, Ziele und Item-Slots.
-- `resources/items/` — Item-Ressourcen.
-- `scenes/world/` — Menü- und Match-Szenen.
-- `scripts/world/casino_tower.gd` — prozedurale Casino-Geometrie und Liftwechsel.
-- `scripts/ui/` — Menü, Charakterauswahl und Match-HUD.
-- `scripts/items/` — Verhalten nach Gadget-, Werkzeug- und Waffenkategorien.
+- `project.godot` — project settings, input map and autoloads.
+- `autoload/` — event bus and game, save, audio, locale and item managers.
+- `core/` — character, player, match, risk and entry-check logic.
+- `resources/characters/` — faction, statistics, objectives and item-slot data.
+- `resources/items/` — item resources.
+- `scenes/world/` — menu, world and match scenes.
+- `scripts/world/casino_tower.gd` — procedural casino geometry and elevator transitions.
+- `scripts/ui/` — menus, character selection and match HUD.
+- `scripts/items/` — gadget, tool and weapon behavior.
 
-## 8. Grenzen und nächste Schritte
+## 8. Known limitations and next steps
 
-Das Projekt ist ein spielbarer Prototyp, kein fertiger Release. Die fünf Etagen, Rollenressourcen, Loadout-Kategorien und zentrale Match-Systeme sind vorhanden. Vollständige Poker-/Blackjack-Regeln, ausgewogene und klar angezeigte Item-Effekte, ausgebaute Fraktionsfähigkeiten, Zugangsvoraussetzungen je Etage, Boss-UI und Balancing sind noch offen. Die offenen Aufgaben sind in [Issue #2](https://github.com/Mr1Err0r1/rush_protocol/issues/2), [Issue #3](https://github.com/Mr1Err0r1/rush_protocol/issues/3) und [Issue #4](https://github.com/Mr1Err0r1/rush_protocol/issues/4) nachverfolgbar.
+This is an active prototype, not a finished game or release build. The five-floor environment, role resources, loadout categories and central match systems form a foundation. The major remaining areas include complete poker/blackjack loops, clear and balanced item effects, implemented faction abilities, floor access requirements, a finished boss encounter, onboarding, localization coverage, platform QA and overall balance. Track current work in [GitHub issues](https://github.com/Mr1Err0r1/rush_protocol/issues).
 
-Die aktuell fehlenden Einstellungsübersetzungen werden im Feature-Branch ergänzt; das zugehörige Issue ist [Issue #3](https://github.com/Mr1Err0r1/rush_protocol/issues/3).
+## 9. Local testing
 
-## 9. Projekt lokal testen
-
-Mit Godot 4.7 oder neuer:
+Use Godot 4.7 or newer for a headless editor import check:
 
 ```bash
 godot --headless --editor --path . --quit
-godot --headless --path . res://scenes/world/match_world.tscn --quit-after 4
 ```
+
+This import check alone does not certify gameplay balance, online behavior, audiovisual quality or release readiness. A reusable automated scene smoke-test script is proposed in [PR #11](https://github.com/Mr1Err0r1/rush_protocol/pull/11) and is not part of `main` yet.
