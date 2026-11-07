@@ -20,7 +20,7 @@ run_case() {
   # Godot may report cached resources as still referenced at hard process exit;
   # this is distinct from script/scene loading errors and is not actionable here.
   if grep -E '(^|[[:space:]])(ERROR|SCRIPT ERROR):|Parse Error:|Animation not found|invalid UID' "$log_file" \
-      | grep -Ev '^ERROR: [0-9]+ resources still in use at exit$'; then
+      | grep -Ev '^ERROR: [0-9]+ resources still in use at exit'; then
     cat "$log_file" >&2
     printf 'FAIL %s: error-level engine output found\n' "$label" >&2
     return 1
