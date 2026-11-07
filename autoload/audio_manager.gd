@@ -69,6 +69,20 @@ func _ready() -> void:
 	_apply_volumes()
 
 
+func _exit_tree() -> void:
+	# Stop playback explicitly so stream playbacks do not outlive this autoload
+	# during editor/test shutdown (notably the looping menu music).
+	_music_request += 1
+	_kill_music_tween()
+	if _music_player != null:
+		_music_player.stop()
+		_music_player.stream = null
+	for player in _sfx_players:
+		if is_instance_valid(player):
+			player.stop()
+			player.stream = null
+
+
 func play_sfx(sound_key: String) -> void:
 	if not SFX_MAP.has(sound_key):
 		return
