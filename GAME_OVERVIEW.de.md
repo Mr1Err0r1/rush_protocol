@@ -45,11 +45,19 @@ Charaktere liegen als Datenressourcen unter `resources/characters/`. Startwerte 
 |---|---|---:|---:|---:|---:|---:|---:|---|
 | Assassine | Assassinen-Gilde | 3 | 0 | 0 | 2 | 50 | 3 | Gift-Nadel |
 | Zivilist | Zivilisten | 5 | 0 | 0 | 1 | 30 | 1 | — |
-| Regierungsagent | Regierung | 3 | 0 | 1 | 4 | 60 | 2 | Fake-ID, Abhörwanze |
+| Agent | Geheimdienst | 3 | 0 | 1 | 4 | 60 | 2 | Fake-ID, Abhörwanze |
 | Mafia-Boss | Mafia | 4 | 1 | 3 | 4 | 80 | 2 | Revolver |
 | Militärischer Einsatzleiter | Militär | 5 | 0 | 1 | 3 | 45 | 1 | Revolver |
 | Millionär | Casino-Elite | 3 | 2 | 2 | 5 | 150 | 2 | Falschmünze / Fake-Chip |
 | Verdeckter Ermittler | Ermittler | 3 | 0 | 0 | 3 | 40 | 1 | KI-Linse |
+| Leutnant | Militär | 4 | 0 | 1 | 4 | 55 | 2 | Revolver |
+| Soldat | Militär | 6 | 0 | 1 | 1 | 25 | 1 | Schutzband |
+| Analyst | Geheimdienst | 3 | 0 | 0 | 3 | 70 | 3 | KI-Linse |
+| Journalist | Zivilisten | 4 | 0 | 0 | 2 | 35 | 2 | Abhörwanze |
+| Zocker | Zivilisten | 4 | 0 | 1 | 1 | 100 | 2 | Falschmünze / Fake-Chip |
+| Capo | Mafia | 4 | 1 | 2 | 3 | 70 | 2 | Revolver |
+| Schläger | Mafia | 6 | 1 | 2 | 1 | 30 | 2 | Kleber |
+| Buchhalter | Mafia | 3 | 0 | 1 | 3 | 120 | 2 | Falschmünze / Fake-Chip |
 
 Charakterressourcen enthalten außerdem Fähigkeits- und Ziel-IDs (zum Beispiel `passive_fear_aura`, `active_mob_call`, `eliminate_rivals` und `expose_criminals`). Nicht alle aufgeführten Fähigkeiten sind vollständig spielmechanisch implementiert; Fraktionsfähigkeiten und Boss-Handlungsbogen sind noch Entwicklungsarbeit, dokumentiert in [Issue #4](https://github.com/Mr1Err0r1/rush_protocol/issues/4).
 

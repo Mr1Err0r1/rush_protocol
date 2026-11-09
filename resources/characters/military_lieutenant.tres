@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"military_lieutenant"
+faction_id = &"military"
+display_name = "Leutnant"
+lore_text = "Junger Offizier mit Befehlsgewalt und einem Auftrag, über den du nicht sprechen darfst. Du führst, du planst – und du trägst die Verantwortung, wenn im Blackglass etwas schiefgeht."
+gender_options = ["m", "f", "nb"]
+start_health = 4
+start_suspicion = 0
+start_heat = 1
+start_influence = 4
+start_chips = 55
+smuggle_slots = 2
+guaranteed_items = [&"revolver"]
+allowed_item_categories = ["intel", "gadget", "tool", "weapon"]
+detection_resistance = 0.2
+entry_bonus_id = &"bonus_clearance_level"
+passive_ability_id = &"passive_tactical_read"
+active_ability_id = &"active_secure_area"
+primary_objective = "secure_the_vault"
+unlocked_by_default = true

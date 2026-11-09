@@ -45,11 +45,19 @@ Characters are data resources under `resources/characters/`. The selection wizar
 |---|---|---:|---:|---:|---:|---:|---:|---|
 | Assassin | Assassins' Guild | 3 | 0 | 0 | 2 | 50 | 3 | Poison needle |
 | Civilian | Civilians | 5 | 0 | 0 | 1 | 30 | 1 | — |
-| Government agent | Government | 3 | 0 | 1 | 4 | 60 | 2 | Fake ID, listening bug |
+| Agent | Intelligence | 3 | 0 | 1 | 4 | 60 | 2 | Fake ID, listening bug |
 | Mafia boss | Mafia | 4 | 1 | 3 | 4 | 80 | 2 | Revolver |
 | Military field leader | Military | 5 | 0 | 1 | 3 | 45 | 1 | Revolver |
 | Millionaire | Casino elite | 3 | 2 | 2 | 5 | 150 | 2 | Fake coin / chip |
 | Undercover investigator | Investigators | 3 | 0 | 0 | 3 | 40 | 1 | AI lens |
+| Lieutenant | Military | 4 | 0 | 1 | 4 | 55 | 2 | Revolver |
+| Soldier | Military | 6 | 0 | 1 | 1 | 25 | 1 | Bulletproof band |
+| Analyst | Intelligence | 3 | 0 | 0 | 3 | 70 | 3 | AI lens |
+| Journalist | Civilians | 4 | 0 | 0 | 2 | 35 | 2 | Listening bug |
+| Gambler | Civilians | 4 | 0 | 1 | 1 | 100 | 2 | Coin |
+| Capo | Mafia | 4 | 1 | 2 | 3 | 70 | 2 | Revolver |
+| Enforcer | Mafia | 6 | 1 | 2 | 1 | 30 | 2 | Glue |
+| Accountant | Mafia | 3 | 0 | 1 | 3 | 120 | 2 | Coin |
 
 Character resources also contain ability and objective IDs (for example, `passive_fear_aura`, `active_mob_call`, `eliminate_rivals` and `expose_criminals`). Not every listed ability has a complete gameplay implementation; faction abilities and the boss arc remain development work tracked in [issue #4](https://github.com/Mr1Err0r1/rush_protocol/issues/4).
 

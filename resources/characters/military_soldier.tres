@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"military_soldier"
+faction_id = &"military"
+display_name = "Soldat"
+lore_text = "Du folgst Befehlen, hältst viel aus und stellst keine Fragen. Wenig Geld, wenig Einfluss – dafür eine Schutzweste und die Ausdauer, um als Letzter stehen zu bleiben."
+gender_options = ["m", "f", "nb"]
+start_health = 6
+start_suspicion = 0
+start_heat = 1
+start_influence = 1
+start_chips = 25
+smuggle_slots = 1
+guaranteed_items = [&"bulletproof_band"]
+allowed_item_categories = ["weapon", "tool"]
+detection_resistance = 0.1
+entry_bonus_id = &"bonus_badge_access"
+passive_ability_id = &"passive_tactical_read"
+active_ability_id = &"active_extraction"
+primary_objective = "eliminate_rivals"
+unlocked_by_default = true
