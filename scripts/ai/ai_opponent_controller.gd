@@ -154,7 +154,7 @@ func _hard_action(state: PlayerState) -> Dictionary:
 	# Analysiert ob Vault-Move sinnvoller ist als Angriff
 	if not state.has_vault_key:
 		# Versuche Vault-Key zu erreichen (Backroom)
-		if state.current_zone == "floor" and randf() > 0.6:
+		if state.current_zone in ["lobby", "floor"] and randf() > 0.6:
 			return {"type": "move", "zone": "backroom"}
 
 	var strongest := _strongest_enemy(state)

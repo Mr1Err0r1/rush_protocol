@@ -14,8 +14,8 @@ segments = 16
 script = ExtResource("1")
 mass = 0.1
 contact_monitor = true
-contacts_reported = 4
-continuous_collision_detection_mode = 1
+max_contacts_reported = 4
+continuous_cd = true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("1")

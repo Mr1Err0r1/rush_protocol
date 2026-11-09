@@ -161,6 +161,11 @@ func _play_anim(clip_name: String) -> void:
 func _try_attack() -> void:
 	if anim_player == null or _attacking:
 		return
+	if not anim_player.has_animation(ANIM_ATTACK):
+		if not _reported_missing_animations.has(ANIM_ATTACK):
+			_reported_missing_animations[ANIM_ATTACK] = true
+			push_warning("PlayerController: attack animation '%s' is missing from the character model." % ANIM_ATTACK)
+		return
 	_attacking = true
 	anim_player.play(ANIM_ATTACK)
 	await anim_player.animation_finished
