@@ -1,0 +1,10 @@
+# Godot-4-Empfehlung: Zeilenenden normalisieren
+* text=auto eol=lf
+
+# Binärdateien nie als Text behandeln
+*.glb binary
+*.png binary
+*.ogg binary
+*.wav binary
+*.ttf binary
+*.otf binary
