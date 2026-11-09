@@ -18,6 +18,9 @@ signal entry_check_started(player_id: int)
 signal entry_check_passed(player_id: int, suspicion_gained: int)
 signal entry_check_failed(player_id: int, caught_item_id: StringName)
 signal player_ejected(player_id: int, reason: String)
+signal checkpoint_started(player_id: int, zone: String)
+## outcome: "clear" (nicht kontrolliert), "searched" (nichts gefunden), "confiscated", "bounced"
+signal checkpoint_result(player_id: int, zone: String, outcome: String, confiscated: Array)
 
 # ── Spieler ─────────────────────────────────────────────────────────────────
 signal player_registered(player_id: int, data: Dictionary)

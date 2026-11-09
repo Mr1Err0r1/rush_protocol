@@ -36,5 +36,11 @@ class_name CharacterClass
 ## z.B. "control_casino","eliminate_rivals","survive_undetected","reach_vault"
 @export var primary_objective: String = ""
 
+@export_group("Kontrollen")
+## Chance, bei Etagenkontrollen durchgewinkt zu werden. -1 = Fraktionsstandard (CheckpointRules).
+@export_range(-1.0, 1.0, 0.01) var checkpoint_skip_chance: float = -1.0
+## Kategorie → Multiplikator auf die Fundchance (z. B. {"weapon": 0.5}); überschreibt den Fraktionsstandard.
+@export var concealment: Dictionary = {}
+
 @export_group("Freischaltung")
 @export var unlocked_by_default: bool = false

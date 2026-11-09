@@ -403,6 +403,14 @@ func request_move_zone(player_id: int, target_zone: String) -> bool:
 		EventBus.ui_toast.emit("Du brauchst den Vault-Schlüssel!", "warn", 2.0)
 		return false
 
+	# Etagenkontrolle beim ersten Betreten (Chancen je Etage/Rolle: CheckpointRules)
+	if match_config.get("checkpoints", true) and CheckpointRules.is_checkpoint(target_zone) \
+			and not state.visited_zones.has(target_zone):
+		var cp: Dictionary = entry_controller.run_checkpoint(player_id, target_zone, self)
+		_announce_checkpoint(cp)
+		if cp.get("outcome", "") == "bounced":
+			return false
+
 	var _old_zone := state.current_zone
 	state.current_zone = target_zone
 	if not state.visited_zones.has(target_zone):
@@ -416,6 +424,16 @@ func request_move_zone(player_id: int, target_zone: String) -> bool:
 		_trigger_boss_encounter(player_id)
 
 	return true
+
+
+func _announce_checkpoint(cp: Dictionary) -> void:
+	match cp.get("outcome", ""):
+		"searched":
+			EventBus.ui_toast.emit("Kontrolle: nichts gefunden.", "info", 2.0)
+		"confiscated":
+			EventBus.ui_toast.emit("Kontrolle: %d Item(s) beschlagnahmt." % cp["confiscated"].size(), "warn", 2.5)
+		"bounced":
+			EventBus.ui_toast.emit("Kontrolle: Du wirst zurückgeschickt!", "warn", 3.0)
 
 
 # ── Vault & Boss ──────────────────────────────────────────────────────────────
