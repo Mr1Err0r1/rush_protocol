@@ -6,7 +6,7 @@
 [ext_resource type="Script" path="res://network/network_rpc_relay.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/ui/match_hud.gd" id="5"]
 [ext_resource type="Script" path="res://scripts/ui/character_select_ui.gd" id="6"]
-[ext_resource type="Script" path="res://scenes/world/match_world_setup.gd" id="99"]
+[ext_resource type="Script" path="res://scripts/world/match_world_setup.gd" id="99"]
 [ext_resource type="Script" path="res://scripts/world/casino_tower.gd" id="101"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="100_pm"]
 
