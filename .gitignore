@@ -1,15 +1,12 @@
+# Godot 4 cache (nie committen)
 .godot/
-.godot/*
-.godot/editor/
-.godot/editor/*
-.import/
-*.import
+
+# Temp- und Editor-Dateien
 *.tmp
 *~
-.DS_Store
-# Godot export and cache
-.export/
-
-# user/editor specific
 *.swp
 *.swo
+.DS_Store
+
+# Export-Ausgaben
+.export/

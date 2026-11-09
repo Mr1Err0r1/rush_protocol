@@ -29,6 +29,7 @@ const SFX_MAP: Dictionary = {
 	"match_over":    "res://assets/sounds/match_over.ogg",
 	"ui_click":      "res://assets/sounds/ui_click.ogg",
 	"ui_hover":      "res://assets/sounds/ui_hover.ogg",
+	"ui_confirm":    "res://assets/sounds/ui_confirm.ogg",
 }
 
 const MUSIC_MAP: Dictionary = {
