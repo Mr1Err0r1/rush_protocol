@@ -161,6 +161,9 @@ func _default_match_config() -> Dictionary:
 		"risk_pool_positive": 4,      # Wie viele "positive" Outcomes im Pool
 		"risk_pool_negative": 6,
 		"allow_self_target": true,
+		# "pool" = Chips-Pool (klassisch), "shells" = Roulette mit scharfen/Platzpatronen.
+		# Schnelltest: Spiel mit  -- --roulette  starten.
+		"risk_mode": "shells" if "--roulette" in OS.get_cmdline_user_args() else "pool",
 	}
 
 

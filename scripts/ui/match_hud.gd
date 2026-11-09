@@ -63,6 +63,8 @@ func _ready() -> void:
 	EventBus.player_eliminated.connect(_on_player_eliminated)
 	EventBus.player_location_changed.connect(_on_player_location_changed)
 	EventBus.risk_triggered.connect(_on_risk_triggered)
+	EventBus.roulette_shot.connect(_on_roulette_shot)
+	EventBus.roulette_reloaded.connect(_on_roulette_reloaded)
 	EventBus.item_used.connect(_on_item_used)
 	EventBus.item_given.connect(_on_item_given)
 	EventBus.match_over.connect(_on_match_over)
@@ -206,6 +208,29 @@ func _on_risk_triggered(_actor_id: int, _target_id: int, oid: StringName, value:
 	outcome_panel.visible  = true
 	outcome_panel.modulate = Color(1, 1, 0.5) if value > 0 else Color(1, 0.4, 0.4)
 	_outcome_timer.start()
+
+
+func _on_roulette_shot(_actor_id: int, target_id: int, live: bool, damage: int) -> void:
+	var text: String
+	var tone: String
+	if live and damage > 0:
+		text = "💥 SCHARF — Spieler %d verliert %d Leben!" % [target_id, damage]
+		tone = "lose"
+	elif live:
+		text = "🛡 SCHARF — die Weste fängt den Treffer ab!"
+		tone = "win"
+	else:
+		text = "💨 Platzpatrone"
+		tone = "info"
+	_show_toast(text, tone, 3.0)
+	outcome_lbl.text       = text
+	outcome_panel.visible  = true
+	outcome_panel.modulate = Color(1, 0.4, 0.4) if live and damage > 0 else Color(1, 1, 0.5)
+	_outcome_timer.start()
+
+
+func _on_roulette_reloaded(live: int, blank: int, total: int) -> void:
+	_show_toast("🔫 Magazin geladen: %d scharf, %d Platz (%d Patronen)" % [live, blank, total], "info", 4.0)
 
 
 func _on_item_used(player_id: int, item_id: StringName, _target_id: int, result: Dictionary) -> void:

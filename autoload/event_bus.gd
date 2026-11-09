@@ -54,6 +54,11 @@ signal risk_peeked(viewer_id: int, outcome_id: StringName)
 signal risk_forced(actor_id: int, outcome_id: StringName)
 signal risk_pool_empty()
 
+# ── Roulette-Modus (risk_mode "shells") ─────────────────────────────────────
+signal roulette_started(level: int, live: int, blank: int, total: int)
+signal roulette_reloaded(live: int, blank: int, total: int)
+signal roulette_shot(actor_id: int, target_id: int, live: bool, damage: int)
+
 # ── Zonen & Kasino ─────────────────────────────────────────────────────────
 signal zone_unlocked(zone_id: String, by_player_id: int)
 signal zone_locked(zone_id: String, reason: String)

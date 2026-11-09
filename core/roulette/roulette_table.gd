@@ -8,6 +8,7 @@ class_name RouletteTable
 ##  • Scharf → Ziel verliert 1 Leben (2 mit Säge). Platzpatrone → nichts.
 ##  • Platzpatrone auf sich selbst → man bleibt am Zug. Alles andere beendet den Zug.
 ##  • Items: peek (Lupe), saw (Säge), cuff (Handschellen), heal (Verbandskasten), eject (Auswerfen).
+##  • Schutzweste (set_shield) fängt den nächsten Treffer ab.
 ##  • Ist das Magazin leer, wird neu geladen (Anzahlen werden angesagt).
 ##  • Je höher die Etage (level 1–5), desto größer das Magazin und desto höher der Anteil scharfer Patronen.
 ##
@@ -37,6 +38,7 @@ var _rng: RandomNumberGenerator
 var _turn_index: int = 0
 var _sawed: Dictionary = {}      # player_id → nächster Schuss doppelt
 var _cuffed: Dictionary = {}     # player_id → setzt den nächsten Zug aus
+var _shield: Dictionary = {}     # player_id → fängt den nächsten Treffer ab (Schutzweste)
 
 
 func _init(rng: RandomNumberGenerator = null) -> void:
@@ -66,6 +68,7 @@ func setup(player_hp: Dictionary, lvl: int = 1) -> void:
 			order.append(pid)
 	_sawed.clear()
 	_cuffed.clear()
+	_shield.clear()
 	_turn_index = 0
 	winner_id = -1
 	_reload()
@@ -90,6 +93,20 @@ func is_alive(pid: int) -> bool:
 
 func is_sawed(pid: int) -> bool:
 	return _sawed.get(pid, false)
+
+
+func has_shield(pid: int) -> bool:
+	return _shield.get(pid, false)
+
+
+## Schutzweste an-/ausschalten: fängt den nächsten Treffer vollständig ab.
+func set_shield(pid: int, on: bool) -> void:
+	if not is_alive(pid):
+		return
+	if on:
+		_shield[pid] = true
+	else:
+		_shield.erase(pid)
 
 
 func is_cuffed(pid: int) -> bool:
@@ -130,6 +147,12 @@ func shoot(actor_id: int, target_id: int) -> Dictionary:
 		damage = 2 if _sawed.get(actor_id, false) else 1
 	_sawed.erase(actor_id)   # die Säge gilt nur für den nächsten Schuss, egal ob scharf
 
+	var absorbed := false
+	if damage > 0 and _shield.get(target_id, false):
+		absorbed = true
+		damage = 0
+		_shield.erase(target_id)
+
 	var killed := false
 	if damage > 0:
 		hp[target_id] = maxi(int(hp[target_id]) - damage, 0)
@@ -149,7 +172,7 @@ func shoot(actor_id: int, target_id: int) -> Dictionary:
 	_check_over()
 
 	return {"ok": true, "shell": shell, "live": live, "damage": damage, "target_id": target_id,
-			"killed": killed, "keeps_turn": keeps_turn, "reloaded": reloaded,
+			"killed": killed, "absorbed": absorbed, "keeps_turn": keeps_turn, "reloaded": reloaded,
 			"over": is_over(), "winner_id": winner_id}
 
 
@@ -199,6 +222,23 @@ func use_eject(actor_id: int) -> int:
 	return shell
 
 
+## Spieler vom Tisch nehmen (z. B. von außen eliminiert).
+func drop(pid: int) -> void:
+	_remove(pid)
+	_check_over()
+
+
+## Leben eines Spielers von außen setzen (z. B. aus dem PlayerState). hp <= 0 nimmt ihn vom Tisch.
+func sync_player(pid: int, hp_value: int, max_hp_value: int) -> void:
+	if not is_alive(pid):
+		return
+	if hp_value <= 0:
+		drop(pid)
+		return
+	hp[pid] = hp_value
+	max_hp[pid] = maxi(max_hp_value, hp_value)
+
+
 # ── intern ────────────────────────────────────────────────────────────────────
 
 func _reload() -> void:
@@ -214,6 +254,7 @@ func _remove(pid: int) -> void:
 	order.remove_at(idx)
 	_sawed.erase(pid)
 	_cuffed.erase(pid)
+	_shield.erase(pid)
 	if idx < _turn_index:
 		_turn_index -= 1
 	if not order.is_empty():
