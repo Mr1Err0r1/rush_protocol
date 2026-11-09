@@ -1,86 +1,89 @@
 # Rush Protocol — Blackglass Casino
 
-**Rush Protocol** ist ein taktisches 3D-Spiel in Godot 4.7: Schleuse Ausrüstung ins Casino, bluffe an den Spieltischen, verwalte Chips und Misstrauen und entscheide, ob du als Syndikat, Ermittler, Einsatzkraft oder unauffälliger Gast die Kontrolle übernimmst.
+**Rush Protocol** is a Godot 4.7 tactical 3D game prototype set in a multi-floor casino. Choose a role, prepare a limited loadout, pass a fictional security check, manage chips and suspicion, and try to outplay rival factions as you move through the casino tower.
 
-Die vollständige Beschreibung von Spielschleife, Etagen, Rollenwerten, Fraktionen, Inventar, Items, Steuerung und aktuellem Entwicklungsstand steht in [GAME_OVERVIEW.md](GAME_OVERVIEW.md).
+> **Status:** Active prototype / pre-release. This repository is not a finished or production-ready game. Poker and blackjack are not yet complete playable table games. Weapons, contraband, deception and casino cheating are fictional game mechanics; this project does not provide real-world instructions.
 
-> Alle Waffen, Schmuggelobjekte und Täuschungsaktionen sind fiktive Spielmechaniken. Das Spiel beschreibt keine realen Methoden.
+## Read this in your language
 
-## Das Spiel in Kürze
+- **English (primary):** this page and [the full game overview](GAME_OVERVIEW.md)
+- [Deutsch](README.de.md) · [Ausführliche Spielübersicht](GAME_OVERVIEW.de.md)
+- [Русский](README.ru.md) · [Полный обзор игры](GAME_OVERVIEW.ru.md)
 
-Die Partie führt vom Charakter und Loadout über die Einlasskontrolle in die Casino-Runden. Spieler sammeln Chips und Items, nutzen ihre Ausrüstung, wagen riskante Aktionen und versuchen, unentdeckt vorzudringen. Die Casino-Welt ist als mehrstöckiger Schauplatz mit Aufzügen angelegt:
+English is the canonical project documentation. The German and Russian pages are maintained translations; when they differ, use the English version as the reference.
 
-1. **Spielhalle** — Poker-, Blackjack-, Roulette- und High-Stakes-Tische; hier beginnt der Run.
-2. **Goldener Salon (VIP)** — teure Tische, mehr Einfluss und mehr Aufmerksamkeit.
-3. **Hinterzimmer / Schwarzmarkt** — diskrete Deals und ein riskanter Weg an Security vorbei.
-4. **Tresor-Korridor** — Zugang zur gesicherten Zone; hier zählen Schlüssel, Chips und Vertrauen.
-5. **Penthouse des Hausherrn** — finale Konfrontation um das Casino.
+## What is in the prototype
 
-Die Etagen werden beim Start der Match-Welt prozedural aus Godot-Meshes aufgebaut. Betritt einen markierten Liftbereich, um die nächste Ebene zu erreichen. Die Etage wird außerdem in der Spielerposition erfasst.
+- A five-floor casino-tower environment, assembled from Godot 3D geometry at runtime, with themed floors and elevator areas.
+- Character resources representing the Mafia, Assassins' Guild, civilians, military, government/investigators and casino elite.
+- Character-specific starting stats, guaranteed equipment and smuggling/loadout rules.
+- A fictional entry inspection, suspicion and heat systems, player inventory, chips, risk actions and a range of gadgets and weapons.
+- Main-menu, settings, save, HUD, solo/AI and networking foundations.
 
-## Fraktionen und Rollen
+Several features remain prototypes or data-driven foundations. The penthouse signals a boss encounter, but the complete boss arena, quest chain and polished boss UI are not finished. Poker/blackjack rules, dealer AI, faction abilities, floor access gates, balance and final presentation still need work. See [GAME_OVERVIEW.md](GAME_OVERVIEW.md) for the detailed feature inventory and known limitations.
 
-- **Mafia** — Einfluss, Einschüchterung und Kontrolle über das Haus.
-- **Militär** — hohe Widerstandskraft; startet mit einer fiktiven, dienstlichen Revolver-Ausrüstung.
-- **Zivilisten** — wenig Vorbereitung, dafür leicht zu unterschätzen.
-- **Assassinen-Gilde** — lautloser Stil und Gift-Nadel als Startausrüstung.
-- **Regierung und Ermittler** — Zugang, Beobachtung und Aufklärung.
-- **Casino-Elite** — viele Start-Chips und Möglichkeiten, andere zu beeinflussen.
+## Requirements and run
 
-Fraktions-IDs sind Daten an den Charakter-Ressourcen (`resources/characters/*.tres`) und erscheinen in der Charakterauswahl. Neue Rollen können als weitere `CharacterClass`-Resource ergänzt werden.
+- Godot **4.7 or newer** (the project targets Godot 4.x).
+- Git, if cloning from the command line.
 
-## Schmuggel, Inventar und Casino-Betrug
+```bash
+git clone https://github.com/Mr1Err0r1/rush_protocol.git
+cd rush_protocol
+```
 
-Das Loadout-System und die Einlasskontrolle sind bereits Teil des Spiels. Charaktere haben eigene Schmuggel-Slots, Startwerte und garantierte Items; nicht garantierte Gegenstände können bei einer Kontrolle auffliegen. Das Inventar ist pro Spieler geführt. Vorhandene Ausrüstung umfasst unter anderem Falsch-Chips, gezinkte Karten, gefälschte Ausweise, Abhör-/Analyse-Gadgets, Schutzweste, Rauchgranate, Revolver, Gift-Nadel und Tresorschlüssel-Kopie.
+Import and open `project.godot` in Godot, then run the project. The main scene opens the main menu. Use the solo flow to start a local prototype match; available menu paths can change as development continues.
 
-Der Risiko-Pool liefert Gewinne oder Verluste. Die gezinkten Karten (`fake_cards`) können das nächste Ergebnis manipulieren; ein erzwungenes Ergebnis wird vom Risiko-Controller verwaltet. Das ist die Grundlage für weiter ausbaubare Tischspiele wie Poker und Blackjack. Es handelt sich derzeit **nicht** um vollständige Pokerregeln mit Kartenhand, Setzrunden und KI-Dealer — die Tischspiele sind aktuell Welt-/Konzeptpunkte und der manipulierbare Risiko-Pool die vorhandene Casino-Mechanik.
-
-## Steuerung
-
-- **W/A/S/D** — bewegen
-- **Maus** — Kamera bewegen
-- **Shift** — sprinten
-- **Leertaste** — springen
-- **E** — reservierte Interaktionstaste; die Aufzüge lösen im aktuellen Prototyp beim Betreten der Liftfläche aus
-- **1–4** — Item aus der Hotbar verwenden
-- **Linksklick** — Risiko-Aktion
-- **T** — Zielspieler wechseln
-- **Enter** — Zug beenden
-- **V** — Angriff (Prototyp-Aktion)
-- **F5** — Kamera-Modus wechseln
-- **Esc** — Pause
-
-## Starten
-
-1. Godot **4.7** öffnen.
-2. Dieses Repository als Projekt importieren.
-3. `project.godot` starten; die Hauptszene ist das Hauptmenü.
-4. Solo-Spiel starten, Charakter auswählen und Loadout bestätigen.
-
-Headless-Import/Editorprüfung:
+For a headless editor import check (requires the Godot executable on `PATH`):
 
 ```bash
 godot --headless --editor --path . --quit
-godot --headless --path . --quit-after 10
 ```
 
-## Projektstruktur
+This import check does not replace a full interactive playtest or audiovisual QA. A reusable automated scene smoke-test script is proposed in [PR #11](https://github.com/Mr1Err0r1/rush_protocol/pull/11) and is not part of `main` yet.
+
+## Controls
+
+The exact available actions depend on the current scene and match phase. Default prototype bindings include:
+
+| Input | Action |
+|---|---|
+| `W A S D` | Move |
+| Mouse | Look / camera |
+| `Shift` | Sprint |
+| `Space` | Jump |
+| `1`–`4` | Use the corresponding hotbar item |
+| Left mouse button | Risk action (where available) |
+| `T` | Select target player |
+| `Enter` | End turn |
+| `V` | Prototype attack input |
+| `F5` | Change camera mode |
+| `Esc` | Pause / navigate back, depending on screen |
+| `E` | Reserved interaction binding; elevator areas currently trigger on entry |
+
+Settings and key-binding behavior may vary by screen and may still be under development.
+
+## Repository map
 
 ```text
-autoload/               Globale Manager (Match, Items, Netzwerk, Saves, Audio)
-core/                   Charakter-, Spieler-, Match- und Risiko-Logik
-resources/characters/   Rollen-/Fraktionsdaten als Godot-Resources
-resources/items/        Item-Daten als Godot-Resources
-scenes/world/           Menü, Welt und Match-Szenen
-scripts/world/          Match-Setup und prozeduraler Casino-Turm
-scripts/items/           Itemverhalten, nach Kategorien organisiert
-scripts/ui/              Charakterauswahl, Match-HUD, Menüs
+autoload/               Global managers (game, save, locale, items, audio, events)
+core/                   Character, player, match and risk logic
+resources/characters/   Character and faction data
+resources/items/        Item definitions
+scenes/world/           Main menu, game world and match scenes
+scripts/world/          Match setup and procedural casino tower
+scripts/ui/              Menus, character selection and HUD
+scripts/items/           Item behavior
 ```
 
-## Aktueller Entwicklungsstand
+## Contributing and project documentation
 
-Dieses Repository ist ein aktiver Prototyp, kein fertiges Online-Casino-Spiel. Solo-/Hotseat-/Netzwerk-Grundlagen, Charakterauswahl, Einlass-/Schmuggel-Logik, Risikoaktionen, Items, HUD und Save-/Menüsystem sind im Code angelegt. Die Casino-Etagen sind ein spielbarer 3D-Schauplatz-Prototyp. Vollständige Poker-/Blackjack-Regeln, Dealer-KI, Fraktionsquests, Boss-Phasen mit eigener Arena und Balancing sind sinnvolle nächste Meilensteine.
+Please open an issue before large or cross-cutting changes. Keep changes focused, avoid committing Godot's generated `.godot/` cache, and test resource paths and scenes in Godot before opening a pull request. See the [detailed overview](GAME_OVERVIEW.md) for architecture and gameplay notes.
 
-## Lizenz und Beiträge
+## Releases
 
-Siehe Repository-Lizenz, falls vorhanden. Für Änderungen bitte Godot-Import und Projektstart testen und Ressourcen-Referenzen in `.tscn`/`.tres` auf vorhandene Dateien prüfen.
+There is **no stable or production release yet**. The repository is in active prototype development. A release should wait until the core table-game loop, faction/character onboarding, key gameplay flows, platform testing, licensing and a reproducible build have been reviewed. Do not treat the current `main` branch as a finished game or a release build.
+
+## License
+
+No license has been confirmed in this repository at the time of writing. Unless and until a license is added, the source remains subject to the default copyright rules; please do not assume it is open-source or redistribute it. See [issue #44](https://github.com/Mr1Err0r1/rush_protocol/issues/44) for the licensing decision.

@@ -24,6 +24,9 @@ const FLOOR_COLORS := [
 
 var _materials: Array[StandardMaterial3D] = []
 var _elevator_lock := false
+## Optional: Callable(body: Node3D, zone_id: String) -> bool.
+## Wird vor dem Teleport gefragt; false = Aufzug verweigert die Fahrt.
+var travel_validator: Callable = Callable()
 
 func _ready() -> void:
 	_build_materials()
@@ -157,9 +160,13 @@ func _add_elevator(parent: Node3D, floor_index: int, direction: int) -> void:
 	parent.add_child(area)
 
 func _on_elevator_entered(body: Node3D, target_floor: int) -> void:
-	if _elevator_lock or not body is CharacterBody3D:
+	if _elevator_lock or not (body is CharacterBody3D):
 		return
 	_elevator_lock = true
+	if travel_validator.is_valid() and not travel_validator.call(body, FLOOR_ZONES[target_floor]):
+		await get_tree().create_timer(0.8).timeout
+		_elevator_lock = false
+		return
 	var safe_destination := Vector3(0.0, target_floor * FLOOR_HEIGHT + 1.1, 0.0)
 	body.global_position = to_global(safe_destination)
 	floor_changed.emit(body, FLOOR_ZONES[target_floor], FLOOR_NAMES[target_floor])
