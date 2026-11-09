@@ -25,6 +25,7 @@ var active_match: Node = null   # MatchController
 var match_stats: Dictionary = {}
 var paused_from_state: AppState = AppState.MATCH
 var mouse_mode_before_pause: Input.MouseMode = Input.MOUSE_MODE_CAPTURED
+var pause_rebind_capture: bool = false
 
 
 func _ready() -> void:
@@ -32,6 +33,8 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if pause_rebind_capture:
+		return
 	if not event.is_action_pressed("pause"):
 		return
 	if event is InputEventKey and event.echo:

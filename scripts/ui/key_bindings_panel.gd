@@ -57,6 +57,10 @@ func _ready() -> void:
 	refresh()
 
 
+func _exit_tree() -> void:
+	_cancel_rebind()
+
+
 ## Baut die Liste neu aus der aktuellen InputMap.
 ## Aufrufen wenn die Seite gezeigt wird, damit Sprint/Jump sicher geladen sind.
 func refresh() -> void:
@@ -148,6 +152,7 @@ func _start_rebind(action: String, btn: Button) -> void:
 	_cancel_rebind()
 	_rebinding  = action
 	_rebind_btn = btn
+	GameManager.pause_rebind_capture = action == "pause"
 	btn.add_theme_stylebox_override("normal", _sty_rb)
 	btn.add_theme_stylebox_override("hover",  _sty_rb)
 	btn.text = "[ Taste drücken … ]"
@@ -158,6 +163,7 @@ func _apply_rebind(event: InputEvent) -> void:
 	var btn    := _rebind_btn
 	_rebinding  = ""
 	_rebind_btn = null
+	GameManager.pause_rebind_capture = false
 
 	# ESC bricht Rebinding ab, außer wenn gerade die Pause-Taste gebunden wird.
 	if event is InputEventKey:
@@ -176,6 +182,7 @@ func _cancel_rebind() -> void:
 		_reset_btn_style(_rebind_btn, _rebinding)
 	_rebinding  = ""
 	_rebind_btn = null
+	GameManager.pause_rebind_capture = false
 
 
 func _reset_btn_style(btn: Button, action: String) -> void:

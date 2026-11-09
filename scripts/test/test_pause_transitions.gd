@@ -9,6 +9,21 @@ func _run_tests() -> void:
 	var escape := InputEventKey.new()
 	escape.keycode = KEY_ESCAPE
 	escape.pressed = true
+	var panel: Control = (load("res://scripts/ui/key_bindings_panel.gd") as Script).new()
+	root.add_child(panel)
+	await process_frame
+	var capture_button := Button.new()
+	manager.app_state = manager.AppState.MATCH
+	panel.call("_start_rebind", "pause", capture_button)
+	assert(manager.pause_rebind_capture, "Binding the pause action must temporarily capture Escape")
+	manager._input(escape)
+	assert(manager.app_state == manager.AppState.MATCH, "Escape must reach the key-binding capture without pausing")
+	panel.call("_unhandled_input", escape)
+	assert(not manager.pause_rebind_capture, "Completing pause rebinding must release input capture")
+	assert(manager.app_state == manager.AppState.MATCH, "Rebinding Escape must not pause the match")
+	panel.queue_free()
+	capture_button.free()
+	await process_frame
 
 	manager.app_state = manager.AppState.MATCH
 	manager._input(escape)
