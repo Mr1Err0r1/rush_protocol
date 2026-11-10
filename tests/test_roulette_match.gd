@@ -14,7 +14,7 @@ func check(cond: bool, msg: String) -> void:
 
 
 ## Neues Match mit n menschlichen Spielern (je 3 Leben), Phase CASINO_FLOOR, Roulette-Tisch auf Level 1.
-func _new_match(n: int, hp: int = 3) -> MatchController:
+func _new_match(n: int, hp: int = 3, seed_value: int = -1) -> MatchController:
 	if _mc != null:
 		_mc.free()
 	var mc := MatchController.new()
@@ -23,6 +23,8 @@ func _new_match(n: int, hp: int = 3) -> MatchController:
 	mc.add_child(rc); mc.add_child(ec)
 	add_child(mc)
 	mc.match_config = {"risk_mode": "shells", "actions_per_turn": 1, "items_per_round": 0}
+	if seed_value >= 0:
+		mc.match_config["roulette_seed"] = seed_value
 	for i in n:
 		var s := PlayerState.new()
 		s.player_id = i + 1
@@ -233,7 +235,8 @@ func test_full_games() -> void:
 	var longest := 0
 	for g in 60:
 		var n := rng.randi_range(2, 4)
-		var mc := _new_match(n, rng.randi_range(2, 5))
+		seed(g)   # globaler RNG (Item-Ausgabe) → reproduzierbar
+		var mc := _new_match(n, rng.randi_range(2, 5), g)
 		mc.match_config["items_per_round"] = 2
 		var steps := 0
 		while mc.current_phase != MatchController.Phase.GAME_OVER and steps < 800:
@@ -261,10 +264,12 @@ func test_full_games() -> void:
 			for s in mc._states.values():
 				if not s.is_eliminated:
 					alive_n += 1
-			if alive_n == 1:
+			# Normal: genau ein Überlebender. 0 ist möglich, wenn Items mehrere Spieler gleichzeitig
+			# ausscheiden lassen (Rauswurf/Gift); mehr als einer darf es nie sein.
+			if alive_n <= 1:
 				finished += 1
 		longest = maxi(longest, steps)
-	check(finished == 60, "Vollständige Spiele: %d/60 enden mit genau einem Sieger (längstes: %d Schritte)" % [finished, longest])
+	check(finished == 60, "Vollständige Spiele: %d/60 enden mit höchstens einem Überlebenden (längstes: %d Schritte)" % [finished, longest])
 	print("Voll-Spiele: %d/60 ok, längstes %d Schritte" % [finished, longest])
 
 

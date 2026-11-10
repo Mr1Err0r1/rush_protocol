@@ -418,100 +418,6 @@ func request_move_zone(player_id: int, target_zone: String) -> bool:
 	return true
 
 
-# ── Roulette ──────────────────────────────────────────────────────────────────
-
-## Roulette-Items werden nur im Roulette-Modus ausgeteilt.
-func _is_dealable(item_id: StringName) -> bool:
-	var idef := ItemDatabase.get_item(item_id) as ItemDefinition
-	return idef == null or not idef.roulette_only or roulette != null
-
-
-## Startet den Roulette-Tisch für alle lebenden Spieler. level < 1 = aus den Etagen der Spieler ableiten.
-func start_roulette(level: int = -1) -> void:
-	roulette = RouletteTable.new()
-	roulette.strict_turns = false   # Zugreihenfolge verwaltet der MatchController
-	roulette.reloaded.connect(func(l: int, b: int, t: int) -> void: EventBus.roulette_reloaded.emit(l, b, t))
-	var hp: Dictionary = {}
-	for pid in _turn_order:
-		var s := get_state(pid)
-		if s != null and not s.is_eliminated:
-			hp[pid] = s.health
-	roulette.setup(hp, level if level >= 1 else _roulette_level())
-	for pid in hp:
-		roulette.sync_player(pid, get_state(pid).health, get_state(pid).max_health)
-	var info := roulette.chamber.announce()
-	EventBus.roulette_started.emit(roulette.level, info["live"], info["blank"], info["total"])
-
-
-func _roulette_level() -> int:
-	var lvl := 1
-	for s in _states.values():
-		if not s.is_eliminated:
-			lvl = maxi(lvl, int(ZONE_LEVELS.get(s.current_zone, 1)))
-	return lvl
-
-
-## Gleicht den Tisch mit den PlayerStates ab (Leben, Westen, Ausgeschiedene, Etagenstufe).
-func _roulette_pull() -> void:
-	for pid in roulette.alive_ids():
-		var s := get_state(pid)
-		if s == null or s.is_eliminated:
-			roulette.drop(pid)
-			continue
-		roulette.sync_player(pid, s.health, s.max_health)
-		roulette.set_shield(pid, s.has_status(&"protected"))
-	roulette.level = clampi(_roulette_level(), RouletteTable.MIN_LEVEL, RouletteTable.MAX_LEVEL)
-
-
-## Lupe: aktuelle Patrone (ShellChamber.Shell) oder ShellChamber.NONE.
-func roulette_peek(player_id: int) -> int:
-	if roulette == null:
-		return ShellChamber.NONE
-	_roulette_pull()
-	return roulette.use_peek(player_id)
-
-
-func _request_roulette_shot(actor_id: int, target_id: int) -> Dictionary:
-	_roulette_pull()
-	var res := roulette.shoot(actor_id, target_id)
-	if not res["ok"]:
-		return {"success": false, "reason": res["reason"]}
-
-	var actor_state  := get_state(actor_id)
-	var target_state := get_state(target_id)
-	var live: bool   = res["live"]
-	var damage: int  = res["damage"]
-
-	if res["absorbed"]:
-		target_state.remove_status(&"protected")
-		EventBus.item_destroyed.emit(target_id, &"bulletproof_band")
-	if damage > 0:
-		var before := target_state.health
-		target_state.modify_resource("health", -damage)
-		EventBus.player_health_changed.emit(target_id, before, target_state.health)
-		if target_id != actor_id:
-			actor_state.stat_targets_hit += 1
-
-	EventBus.roulette_shot.emit(actor_id, target_id, live, damage)
-	EventBus.audio_play_sfx.emit("item_force" if live else "ui_click")
-
-	if target_state.is_eliminated:
-		EventBus.player_eliminated.emit(target_id, actor_id, target_state.elimination_cause)
-
-	_check_win_conditions()
-	var result := {"success": true, "outcome_id": &"live_shell" if live else &"blank_shell",
-			"delta": -damage, "live": live, "damage": damage, "absorbed": res["absorbed"],
-			"keeps_turn": res["keeps_turn"]}
-	if res["keeps_turn"] or current_phase == Phase.GAME_OVER:
-		return result   # Platzpatrone auf sich selbst: Extra-Aktion, Zug läuft weiter
-
-	_actions_this_turn += 1
-	var max_actions: int = match_config.get("actions_per_turn", 1)
-	if _actions_this_turn >= max_actions:
-		_end_turn()
-	return result
-
-
 # ── Vault & Boss ──────────────────────────────────────────────────────────────
 
 func _trigger_vault_event(player_id: int) -> void:
@@ -691,6 +597,105 @@ func _is_authority() -> bool:
 	if not multiplayer.has_multiplayer_peer():
 		return true
 	return multiplayer.is_server()
+
+
+# ── Roulette ──────────────────────────────────────────────────────────────────
+
+## Roulette-Items werden nur im Roulette-Modus ausgeteilt.
+func _is_dealable(item_id: StringName) -> bool:
+	var idef := ItemDatabase.get_item(item_id) as ItemDefinition
+	return idef == null or not idef.roulette_only or roulette != null
+
+
+## Startet den Roulette-Tisch für alle lebenden Spieler. level < 1 = aus den Etagen der Spieler ableiten.
+func start_roulette(level: int = -1) -> void:
+	# Optional: match_config["roulette_seed"] macht den Tisch reproduzierbar (Tests, Replays).
+	var rng: RandomNumberGenerator = null
+	if match_config.has("roulette_seed"):
+		rng = RandomNumberGenerator.new()
+		rng.seed = int(match_config["roulette_seed"])
+	roulette = RouletteTable.new(rng)
+	roulette.strict_turns = false   # Zugreihenfolge verwaltet der MatchController
+	roulette.reloaded.connect(func(l: int, b: int, t: int) -> void: EventBus.roulette_reloaded.emit(l, b, t))
+	var hp: Dictionary = {}
+	for pid in _turn_order:
+		var s := get_state(pid)
+		if s != null and not s.is_eliminated:
+			hp[pid] = s.health
+	roulette.setup(hp, level if level >= 1 else _roulette_level())
+	for pid in hp:
+		roulette.sync_player(pid, get_state(pid).health, get_state(pid).max_health)
+	var info := roulette.chamber.announce()
+	EventBus.roulette_started.emit(roulette.level, info["live"], info["blank"], info["total"])
+
+
+func _roulette_level() -> int:
+	var lvl := 1
+	for s in _states.values():
+		if not s.is_eliminated:
+			lvl = maxi(lvl, int(ZONE_LEVELS.get(s.current_zone, 1)))
+	return lvl
+
+
+## Gleicht den Tisch mit den PlayerStates ab (Leben, Westen, Ausgeschiedene, Etagenstufe).
+func _roulette_pull() -> void:
+	for pid in roulette.alive_ids():
+		var s := get_state(pid)
+		if s == null or s.is_eliminated:
+			roulette.drop(pid)
+			continue
+		roulette.sync_player(pid, s.health, s.max_health)
+		roulette.set_shield(pid, s.has_status(&"protected"))
+	roulette.level = clampi(_roulette_level(), RouletteTable.MIN_LEVEL, RouletteTable.MAX_LEVEL)
+
+
+## Lupe: aktuelle Patrone (ShellChamber.Shell) oder ShellChamber.NONE.
+func roulette_peek(player_id: int) -> int:
+	if roulette == null:
+		return ShellChamber.NONE
+	_roulette_pull()
+	return roulette.use_peek(player_id)
+
+
+func _request_roulette_shot(actor_id: int, target_id: int) -> Dictionary:
+	_roulette_pull()
+	var res := roulette.shoot(actor_id, target_id)
+	if not res["ok"]:
+		return {"success": false, "reason": res["reason"]}
+
+	var actor_state  := get_state(actor_id)
+	var target_state := get_state(target_id)
+	var live: bool   = res["live"]
+	var damage: int  = res["damage"]
+
+	if res["absorbed"]:
+		target_state.remove_status(&"protected")
+		EventBus.item_destroyed.emit(target_id, &"bulletproof_band")
+	if damage > 0:
+		var before := target_state.health
+		target_state.modify_resource("health", -damage)
+		EventBus.player_health_changed.emit(target_id, before, target_state.health)
+		if target_id != actor_id:
+			actor_state.stat_targets_hit += 1
+
+	EventBus.roulette_shot.emit(actor_id, target_id, live, damage)
+	EventBus.audio_play_sfx.emit("item_force" if live else "ui_click")
+
+	if target_state.is_eliminated:
+		EventBus.player_eliminated.emit(target_id, actor_id, target_state.elimination_cause)
+
+	_check_win_conditions()
+	var result := {"success": true, "outcome_id": &"live_shell" if live else &"blank_shell",
+			"delta": -damage, "live": live, "damage": damage, "absorbed": res["absorbed"],
+			"keeps_turn": res["keeps_turn"]}
+	if res["keeps_turn"] or current_phase == Phase.GAME_OVER:
+		return result   # Platzpatrone auf sich selbst: Extra-Aktion, Zug läuft weiter
+
+	_actions_this_turn += 1
+	var max_actions: int = match_config.get("actions_per_turn", 1)
+	if _actions_this_turn >= max_actions:
+		_end_turn()
+	return result
 
 
 # ── KI-Zug ───────────────────────────────────────────────────────────────────
