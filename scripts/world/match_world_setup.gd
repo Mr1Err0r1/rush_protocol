@@ -45,6 +45,11 @@ func _ready() -> void:
 
 	EventBus.audio_play_music.emit("match")
 
+	# Auswahl-Panel für item_mode "draft" (bleibt unsichtbar, solange kein Angebot kommt)
+	var draft_ui := ItemDraftUI.new()
+	add_child(draft_ui)
+	draft_ui.setup(match_ctrl)
+
 
 func _collect_seats() -> void:
 	_seat_transforms.clear()
