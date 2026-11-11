@@ -51,6 +51,18 @@ func _ready() -> void:
 	EventBus.audio_play_music.emit("menu")
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("pause"):
+		return
+	if settings_ui.visible:
+		settings_ui.call("_on_back")
+	elif character_gallery.visible:
+		character_gallery.hide()
+	else:
+		return
+	get_viewport().set_input_as_handled()
+
+
 func _on_overlay_visibility_changed() -> void:
 	var any_open := false
 	for page in _overlay_pages:

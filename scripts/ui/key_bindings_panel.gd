@@ -17,14 +17,15 @@ const BINDABLE: Array = [
 	{ "action": "move_right",      "label": "Rechts" },
 	{ "action": "jump",            "label": "Springen" },
 	{ "action": "sprint",          "label": "Sprinten" },
-	{ "action": "interact",        "label": "Interagieren  (E)" },
-	{ "action": "primary_action",  "label": "Hauptaktion" },
-	{ "action": "secondary_action","label": "Sekundäraktion" },
-	{ "action": "end_turn",        "label": "Zug beenden" },
-	{ "action": "toggle_target",   "label": "Ziel wechseln" },
-	{ "action": "use_item_1",      "label": "Item 1" },
-	{ "action": "use_item_2",      "label": "Item 2" },
-	{ "action": "use_item_3",      "label": "Item 3" },
+		{ "action": "interact",        "label": "Interagieren  (E)" },
+		{ "action": "primary_action",  "label": "Hauptaktion" },
+		{ "action": "secondary_action","label": "Sekundäraktion" },
+		{ "action": "end_turn",        "label": "Zug beenden" },
+		{ "action": "toggle_target",   "label": "Ziel wechseln" },
+		{ "action": "pause",            "label": "Pause-Menü" },
+		{ "action": "use_item_1",      "label": "Item 1" },
+		{ "action": "use_item_2",      "label": "Item 2" },
+		{ "action": "use_item_3",      "label": "Item 3" },
 	{ "action": "use_item_4",      "label": "Item 4" },
 ]
 
@@ -54,6 +55,10 @@ func _ready() -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_make_styles()
 	refresh()
+
+
+func _exit_tree() -> void:
+	_cancel_rebind()
 
 
 ## Baut die Liste neu aus der aktuellen InputMap.
@@ -147,6 +152,7 @@ func _start_rebind(action: String, btn: Button) -> void:
 	_cancel_rebind()
 	_rebinding  = action
 	_rebind_btn = btn
+	GameManager.pause_rebind_capture = action == "pause"
 	btn.add_theme_stylebox_override("normal", _sty_rb)
 	btn.add_theme_stylebox_override("hover",  _sty_rb)
 	btn.text = "[ Taste drücken … ]"
@@ -157,11 +163,12 @@ func _apply_rebind(event: InputEvent) -> void:
 	var btn    := _rebind_btn
 	_rebinding  = ""
 	_rebind_btn = null
+	GameManager.pause_rebind_capture = false
 
-	# ESC = Abbrechen (ESC selbst bleibt nicht bindbar)
+	# ESC bricht Rebinding ab, außer wenn gerade die Pause-Taste gebunden wird.
 	if event is InputEventKey:
 		var kc: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
-		if kc == KEY_ESCAPE:
+		if kc == KEY_ESCAPE and action != "pause":
 			_reset_btn_style(btn, action)
 			return
 
@@ -175,6 +182,7 @@ func _cancel_rebind() -> void:
 		_reset_btn_style(_rebind_btn, _rebinding)
 	_rebinding  = ""
 	_rebind_btn = null
+	GameManager.pause_rebind_capture = false
 
 
 func _reset_btn_style(btn: Button, action: String) -> void:
