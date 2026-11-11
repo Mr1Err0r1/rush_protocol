@@ -16,7 +16,7 @@ Der gewünschte Ton ist ein sozialer Heist-Thriller: Mafia, Militär, Assassinen
 ## 2. Aktueller Prototyp-Spielablauf
 
 1. **Start und Modus:** Das Hauptmenü bietet Einstiegspunkte für Solo gegen KI, Lobby/Netzwerk und lokale Match-Konfiguration. Manche Abläufe befinden sich noch in Entwicklung.
-2. **Charakterrolle:** Jeder Spieler wählt eine `CharacterClass`. Eine Rollenressource definiert Fraktion, Startwerte, Schmuggel-Slots, garantierte Ausrüstung, erlaubte Loadout-Kategorien und ein narratives Ziel.
+2. **Fraktion zuerst:** Spieler wählen zuerst eine Fraktion; danach zeigt die Rollenliste nur verfügbare Rollen dieser Fraktion. Die zuletzt gewählte Rolle merkt sich das Spiel für den nächsten Besuch. Eine Rollenressource definiert Startwerte, Schmuggel-Slots, garantierte Ausrüstung, erlaubte Loadout-Kategorien und ein narratives Ziel.
 3. **Loadout:** Garantierte Rollen-Items werden getrennt von auswählbaren Slots hinzugefügt. Optionale Items müssen schmuggelbar sein und Rollenbeschränkungen erfüllen. Prüfungen existieren sowohl in der Auswahl-UI als auch in der Match-Logik.
 4. **Einlasskontrolle:** Nicht garantierte Items können abhängig von ihrer Entdeckungswahrscheinlichkeit auffliegen. Misstrauen beeinflusst die Kontrolle; entdeckte Items können beschlagnahmt werden. Zu hohes Misstrauen kann zum Rauswurf führen.
 5. **Casino-Züge:** Der Match-Controller verfolgt Phasen wie Itemnutzung, Aktion und Auflösung. Risikoaktionen können Chips verändern und durch ausgewählte Items beeinflusst werden.

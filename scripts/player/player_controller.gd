@@ -72,10 +72,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		pitch = clamp(pitch - mouse.relative.y * mouse_sensitivity, -1.2, 0.6)
 		rotation.y = yaw
 		camera_pivot.rotation.x = pitch
-	if event is InputEventKey and event.pressed:
+	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
-			KEY_ESCAPE:
-				GameManager.toggle_pause()
 			KEY_F5:
 				change_camera()
 
