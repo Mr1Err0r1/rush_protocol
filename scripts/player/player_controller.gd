@@ -32,10 +32,12 @@ class_name PlayerController
 # ── Animation ───────────────────────────────────────────────────────────
 @onready var anim_player: AnimationPlayer = get_node_or_null("MeshRoot/Model/AnimationPlayer")
 
-const ANIM_IDLE   := "Idle"
-const ANIM_WALK   := "Walk"
-const ANIM_RUN    := "Run"
+const ANIM_IDLE   := "Arise"
+const ANIM_WALK   := "Casual_Walk"
+const ANIM_RUN    := "Run_03"
 const ANIM_ATTACK := "Attack"
+
+var _reported_missing_animations: Dictionary = {}
 
 # Bullet scene preload
 const BULLET_SCENE := preload("res://scenes/player/bullet.tscn")
@@ -145,12 +147,24 @@ func _update_animation(input_dir: Vector2, is_sprinting: bool) -> void:
 
 
 func _play_anim(clip_name: String) -> void:
+	if anim_player == null:
+		return
+	if not anim_player.has_animation(clip_name):
+		if not _reported_missing_animations.has(clip_name):
+			_reported_missing_animations[clip_name] = true
+			push_warning("PlayerController: animation '%s' is missing from the character model." % clip_name)
+		return
 	if anim_player.current_animation != clip_name:
 		anim_player.play(clip_name)
 
 
 func _try_attack() -> void:
 	if anim_player == null or _attacking:
+		return
+	if not anim_player.has_animation(ANIM_ATTACK):
+		if not _reported_missing_animations.has(ANIM_ATTACK):
+			_reported_missing_animations[ANIM_ATTACK] = true
+			push_warning("PlayerController: attack animation '%s' is missing from the character model." % ANIM_ATTACK)
 		return
 	_attacking = true
 	anim_player.play(ANIM_ATTACK)

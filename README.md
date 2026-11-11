@@ -40,7 +40,13 @@ For a headless editor import check (requires the Godot executable on `PATH`):
 godot --headless --editor --path . --quit
 ```
 
-This import check does not replace a full interactive playtest or audiovisual QA. A reusable automated scene smoke-test script is proposed in [PR #11](https://github.com/Mr1Err0r1/rush_protocol/pull/11) and is not part of `main` yet.
+This import check does not replace a full interactive playtest or audiovisual QA. Run the project's headless smoke suite to check the editor import, main menu, and every scene:
+
+```bash
+scripts/test/run_headless_smoke.sh
+```
+
+The smoke suite checks scene startup and engine error output; it is not a substitute for gameplay, animation, or audiovisual QA.
 
 ## Controls
 
