@@ -213,7 +213,7 @@ func _start_turn() -> void:
 
 	# Roulette: Handschellen → dieser Zug entfällt
 	if roulette != null and roulette.consume_cuff(active_id):
-		EventBus.ui_toast.emit("Handschellen: Zug ausgesetzt!", "warn", 2.0)
+		EventBus.ui_toast.emit(LocaleManager.translate("roulette.cuffed_turn"), "warn", 2.0)
 		_end_turn()
 		return
 
