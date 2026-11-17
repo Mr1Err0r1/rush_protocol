@@ -125,6 +125,7 @@ func test_controller() -> void:
 	ec.roll_fn = func() -> float: return 0.0
 	var s1 := make_state(1, civ, [&"revolver", &"ai_lens"] as Array[StringName])
 	s1.suspicion = 5   # sichert Fundchance > 0 für beide Items
+	s1.max_suspicion = 20  # testet bounced ohne den separaten Ejektionsfall auszulösen
 	ctrl.states[1] = s1
 	var r1 := ec.run_checkpoint(1, "backroom", ctrl)
 	check(r1["triggered"], "roll 0.0 → kontrolliert")
@@ -138,6 +139,7 @@ func test_controller() -> void:
 	# Bestechung (hoher Einfluss) → kein bounce, nur beschlagnahmt
 	var s2 := make_state(2, civ, [&"revolver", &"ai_lens"] as Array[StringName])
 	s2.suspicion = 5
+	s2.max_suspicion = 20
 	s2.influence = 4
 	ctrl.states[2] = s2
 	check(ec.run_checkpoint(2, "backroom", ctrl)["outcome"] == "confiscated", "Einfluss 4 → bestochen, nur beschlagnahmt")

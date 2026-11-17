@@ -99,11 +99,16 @@ func run_check(player_id: int, match_ctrl: Node) -> Dictionary:
 
 
 ## Etagenkontrolle beim Betreten von `zone` (Chancen: CheckpointRules).
-## Ergebnis: {triggered, outcome ("none"|"clear"|"searched"|"confiscated"|"bounced"),
-##            confiscated, suspicion_gained}
+## Ergebnis: {triggered, outcome ("none"|"clear"|"searched"|"confiscated"|"bounced"|"ejected"),
+##            confiscated, suspicion_gained, ejected}
 func run_checkpoint(player_id: int, zone: String, match_ctrl: Node) -> Dictionary:
-	var result := {"triggered": false, "outcome": "none",
-			"confiscated": [] as Array[StringName], "suspicion_gained": 0}
+	var result := {
+		"triggered": false,
+		"outcome": "none",
+		"confiscated": [] as Array[StringName],
+		"suspicion_gained": 0,
+		"ejected": false,
+	}
 	if not CheckpointRules.is_checkpoint(zone):
 		return result
 	var state: PlayerState = match_ctrl.get_state(player_id)
@@ -155,6 +160,11 @@ func run_checkpoint(player_id: int, zone: String, match_ctrl: Node) -> Dictionar
 		result["outcome"] = "confiscated"
 	else:
 		result["outcome"] = "searched"
+	if state.is_eliminated:
+		result["outcome"] = "ejected"
+		result["ejected"] = true
+		EventBus.player_ejected.emit(player_id, "caught_smuggling")
+		EventBus.player_eliminated.emit(player_id, -1, state.elimination_cause)
 	EventBus.checkpoint_result.emit(player_id, zone, result["outcome"], found)
 	return result
 

@@ -408,7 +408,7 @@ func request_move_zone(player_id: int, target_zone: String) -> bool:
 			and not state.visited_zones.has(target_zone):
 		var cp: Dictionary = entry_controller.run_checkpoint(player_id, target_zone, self)
 		_announce_checkpoint(cp)
-		if cp.get("outcome", "") == "bounced":
+		if cp.get("outcome", "") == "bounced" or cp.get("ejected", false) or state.is_eliminated:
 			return false
 
 	var _old_zone := state.current_zone
@@ -434,6 +434,8 @@ func _announce_checkpoint(cp: Dictionary) -> void:
 			EventBus.ui_toast.emit("Kontrolle: %d Item(s) beschlagnahmt." % cp["confiscated"].size(), "warn", 2.5)
 		"bounced":
 			EventBus.ui_toast.emit("Kontrolle: Du wirst zurückgeschickt!", "warn", 3.0)
+		"ejected":
+			EventBus.ui_toast.emit(LocaleManager.translate("checkpoint.ejected"), "lose", 3.0)
 
 
 # ── Vault & Boss ──────────────────────────────────────────────────────────────

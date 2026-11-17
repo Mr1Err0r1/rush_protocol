@@ -83,6 +83,36 @@ func _ready() -> void:
 	mc.request_move_zone(6, "boss_office")
 	check(seen.size() == 1 and seen[0][2] == "searched", "checkpoint_result 'searched' im Penthouse: %s" % str(seen))
 
+	# One found item can reach the suspicion cap; eliminate before moving or starting a boss encounter.
+	var ejected_events: Array = []
+	var eliminated_events: Array = []
+	EventBus.player_ejected.connect(func(pid, reason): ejected_events.append([pid, reason]))
+	EventBus.player_eliminated.connect(func(pid, killer_id, cause): eliminated_events.append([pid, killer_id, cause]))
+	mc.current_phase = MatchController.Phase.CASINO_FLOOR
+	mc.entry_controller.roll_fn = func() -> float: return 0.0
+	var s7 := _add_player(mc, 7, &"citizen", [&"revolver"] as Array[StringName], 9)
+	check(not mc.request_move_zone(7, "boss_office"), "suspicion-cap ejection blocks movement")
+	check(s7.is_eliminated and s7.elimination_cause == "ejected", "suspicion cap eliminates with ejected cause")
+	check(s7.current_zone == "lobby" and not s7.visited_zones.has("boss_office"), "ejected player stays in lobby and boss office is not visited")
+	check(mc.current_phase == MatchController.Phase.CASINO_FLOOR, "ejected player cannot trigger boss encounter")
+	check(ejected_events.size() == 1 and ejected_events[0][0] == 7 and ejected_events[0][1] == "caught_smuggling", "ejection event is emitted")
+	check(eliminated_events.size() == 1 and eliminated_events[0][0] == 7 and eliminated_events[0][2] == "ejected", "elimination event is broadcast")
+	check(seen.size() == 2 and seen[1][2] == "ejected", "checkpoint result reports ejected")
+
+	# A two-item bounce that also reaches the cap must still emit ejection/elimination.
+	mc.current_phase = MatchController.Phase.CASINO_FLOOR
+	var s8 := _add_player(mc, 8, &"citizen", [&"revolver", &"ai_lens"] as Array[StringName], 9)
+	check(not mc.request_move_zone(8, "backroom"), "two-item suspicion-cap bounce also blocks movement")
+	check(s8.is_eliminated and s8.heat == 1, "two-item bounce applies heat and eliminates at suspicion cap")
+	check(ejected_events.size() == 2 and eliminated_events.size() == 2, "two-item suspicion-cap bounce emits both events")
+	check(seen.size() == 3 and seen[2][2] == "ejected", "two-item cap outcome is ejected")
+	var previous_locale := LocaleManager.current_locale
+	var expected_ejection_text := {"en": "Security check: you have been ejected from the casino.", "de": "Sicherheitskontrolle: Du bist aus dem Casino ausgeschieden.", "ru": "Проверка безопасности: вы выбыли из казино."}
+	for locale in expected_ejection_text:
+		LocaleManager.current_locale = locale
+		check(LocaleManager.translate("checkpoint.ejected") == expected_ejection_text[locale], "ejection message localized for " + locale)
+	LocaleManager.current_locale = previous_locale
+
 	mc.queue_free()
 	_finish()
 
