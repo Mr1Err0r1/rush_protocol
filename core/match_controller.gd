@@ -38,6 +38,11 @@ var _boss_health:        int   = 8
 #@onready var rpc_relay:        Node                 = $RpcRelay   # NetworkRpcRelay
 @onready var rpc_relay = get_node_or_null("RpcRelay")
 
+# ── Roulette-Modus (risk_mode "shells") ───────────────────────────────────────
+## null = klassischer Chips-Pool. Siehe core/roulette/ und start_roulette().
+var roulette: RouletteTable = null
+const ZONE_LEVELS := {"lobby": 1, "vip_lounge": 2, "backroom": 3, "vault_corridor": 4, "boss_office": 5}
+
 # ── Charakter-Klassen-Cache ───────────────────────────────────────────────────
 var _char_classes: Dictionary = {}   # StringName → CharacterClass
 
@@ -182,6 +187,8 @@ func _on_entry_phase_complete() -> void:
 
 	current_phase = Phase.CASINO_FLOOR
 	EventBus.phase_changed.emit("CASINO_FLOOR")
+	if match_config.get("risk_mode", "pool") == "shells":
+		start_roulette()
 	_start_round()
 
 
@@ -203,6 +210,12 @@ func _start_turn() -> void:
 	_actions_this_turn = 0
 	current_turn_phase = TurnPhase.ITEM
 	var active_id := get_active_player_id()
+
+	# Roulette: Handschellen → dieser Zug entfällt
+	if roulette != null and roulette.consume_cuff(active_id):
+		EventBus.ui_toast.emit(LocaleManager.translate("roulette.cuffed_turn"), "warn", 2.0)
+		_end_turn()
+		return
 
 	EventBus.turn_phase_changed.emit("ITEM")
 	EventBus.audio_play_sfx.emit("turn_start")
@@ -346,6 +359,9 @@ func request_risk_action(actor_id: int, target_id: int) -> Dictionary:
 	if actor_state == null or target_state == null:
 		return {"success": false, "reason": "invalid_state"}
 
+	if roulette != null:
+		return _request_roulette_shot(actor_id, target_id)
+
 	var outcome := risk_controller.draw()
 	if outcome == null:
 		return {"success": false, "reason": "pool_empty"}
@@ -461,7 +477,7 @@ func _apply_zone_noise(zone: String, suspicion_amount: int, shooter_id: int) -> 
 
 func _distribute_round_items() -> void:
 	var items_per_round: int = match_config.get("items_per_round", 2)
-	var available_ids   := ItemDatabase.get_all_ids()
+	var available_ids: Array = ItemDatabase.get_all_ids().filter(_is_dealable)
 	if available_ids.is_empty():
 		return
 
@@ -581,6 +597,105 @@ func _is_authority() -> bool:
 	if not multiplayer.has_multiplayer_peer():
 		return true
 	return multiplayer.is_server()
+
+
+# ── Roulette ──────────────────────────────────────────────────────────────────
+
+## Roulette-Items werden nur im Roulette-Modus ausgeteilt.
+func _is_dealable(item_id: StringName) -> bool:
+	var idef := ItemDatabase.get_item(item_id) as ItemDefinition
+	return idef == null or not idef.roulette_only or roulette != null
+
+
+## Startet den Roulette-Tisch für alle lebenden Spieler. level < 1 = aus den Etagen der Spieler ableiten.
+func start_roulette(level: int = -1) -> void:
+	# Optional: match_config["roulette_seed"] macht den Tisch reproduzierbar (Tests, Replays).
+	var rng: RandomNumberGenerator = null
+	if match_config.has("roulette_seed"):
+		rng = RandomNumberGenerator.new()
+		rng.seed = int(match_config["roulette_seed"])
+	roulette = RouletteTable.new(rng)
+	roulette.strict_turns = false   # Zugreihenfolge verwaltet der MatchController
+	roulette.reloaded.connect(func(l: int, b: int, t: int) -> void: EventBus.roulette_reloaded.emit(l, b, t))
+	var hp: Dictionary = {}
+	for pid in _turn_order:
+		var s := get_state(pid)
+		if s != null and not s.is_eliminated:
+			hp[pid] = s.health
+	roulette.setup(hp, level if level >= 1 else _roulette_level())
+	for pid in hp:
+		roulette.sync_player(pid, get_state(pid).health, get_state(pid).max_health)
+	var info := roulette.chamber.announce()
+	EventBus.roulette_started.emit(roulette.level, info["live"], info["blank"], info["total"])
+
+
+func _roulette_level() -> int:
+	var lvl := 1
+	for s in _states.values():
+		if not s.is_eliminated:
+			lvl = maxi(lvl, int(ZONE_LEVELS.get(s.current_zone, 1)))
+	return lvl
+
+
+## Gleicht den Tisch mit den PlayerStates ab (Leben, Westen, Ausgeschiedene, Etagenstufe).
+func _roulette_pull() -> void:
+	for pid in roulette.alive_ids():
+		var s := get_state(pid)
+		if s == null or s.is_eliminated:
+			roulette.drop(pid)
+			continue
+		roulette.sync_player(pid, s.health, s.max_health)
+		roulette.set_shield(pid, s.has_status(&"protected"))
+	roulette.level = clampi(_roulette_level(), RouletteTable.MIN_LEVEL, RouletteTable.MAX_LEVEL)
+
+
+## Lupe: aktuelle Patrone (ShellChamber.Shell) oder ShellChamber.NONE.
+func roulette_peek(player_id: int) -> int:
+	if roulette == null:
+		return ShellChamber.NONE
+	_roulette_pull()
+	return roulette.use_peek(player_id)
+
+
+func _request_roulette_shot(actor_id: int, target_id: int) -> Dictionary:
+	_roulette_pull()
+	var res := roulette.shoot(actor_id, target_id)
+	if not res["ok"]:
+		return {"success": false, "reason": res["reason"]}
+
+	var actor_state  := get_state(actor_id)
+	var target_state := get_state(target_id)
+	var live: bool   = res["live"]
+	var damage: int  = res["damage"]
+
+	if res["absorbed"]:
+		target_state.remove_status(&"protected")
+		EventBus.item_destroyed.emit(target_id, &"bulletproof_band")
+	if damage > 0:
+		var before := target_state.health
+		target_state.modify_resource("health", -damage)
+		EventBus.player_health_changed.emit(target_id, before, target_state.health)
+		if target_id != actor_id:
+			actor_state.stat_targets_hit += 1
+
+	EventBus.roulette_shot.emit(actor_id, target_id, live, damage)
+	EventBus.audio_play_sfx.emit("item_force" if live else "ui_click")
+
+	if target_state.is_eliminated:
+		EventBus.player_eliminated.emit(target_id, actor_id, target_state.elimination_cause)
+
+	_check_win_conditions()
+	var result := {"success": true, "outcome_id": &"live_shell" if live else &"blank_shell",
+			"delta": -damage, "live": live, "damage": damage, "absorbed": res["absorbed"],
+			"keeps_turn": res["keeps_turn"]}
+	if res["keeps_turn"] or current_phase == Phase.GAME_OVER:
+		return result   # Platzpatrone auf sich selbst: Extra-Aktion, Zug läuft weiter
+
+	_actions_this_turn += 1
+	var max_actions: int = match_config.get("actions_per_turn", 1)
+	if _actions_this_turn >= max_actions:
+		_end_turn()
+	return result
 
 
 # ── KI-Zug ───────────────────────────────────────────────────────────────────

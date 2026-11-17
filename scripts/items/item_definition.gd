@@ -26,6 +26,10 @@ class_name ItemDefinition
 @export var suspicion_on_use:      int           = 0
 @export var requires_chips_cost:   int           = 0
 
+@export_group("Roulette")
+## true = nur im Roulette-Modus (risk_mode "shells") im Umlauf; wird sonst nicht ausgeteilt.
+@export var roulette_only: bool = false
+
 @export_group("Passiv")
 @export var passive_effect_id:          StringName = &""
 @export var grants_status_while_held:   StringName = &""

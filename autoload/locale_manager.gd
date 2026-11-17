@@ -203,7 +203,26 @@ const _T: Dictionary = {
 	"toast.stuck":          {"de": "Du kannst dich nicht bewegen!", "en": "You can't move!",       "ru": "Ты не можешь двигаться!"},
 	"toast.suspicion_crit": {"de": "⚠ Misstrauen kritisch!",   "en": "⚠ Suspicion critical!",    "ru": "⚠ Подозрение критично!"},
 	"toast.settings_soon":  {"de": "Einstellungen kommen bald!", "en": "Settings coming soon!",   "ru": "Настройки скоро!"},
-}
+	"hud.you":              {"de": "Du",                       "en": "You",                       "ru": "Вы"},
+	"hud.player":           {"de": "Spieler %d",               "en": "Player %d",                 "ru": "Игрок %d"},
+	"hud.item_used":        {"de": "%s verwendet: %s",         "en": "%s used: %s",              "ru": "%s использовал(а): %s"},
+	"hud.item_received":    {"de": "➕ Erhalten: %s",           "en": "➕ Received: %s",            "ru": "➕ Получено: %s"},
+	"item.roulette_magnifier": {"de": "Lupe", "en": "Magnifier", "ru": "Лупа"},
+	"item.roulette_magnifier_desc": {"de": "Zeigt dir, ob die nächste Patrone scharf oder eine Platzpatrone ist.", "en": "Reveals whether the next shell is live or blank.", "ru": "Показывает, боевой ли следующий патрон или холостой."},
+	"item.roulette_saw": {"de": "Säge", "en": "Saw", "ru": "Пила"},
+	"item.roulette_saw_desc": {"de": "Dein nächster Schuss verursacht doppelten Schaden.", "en": "Your next shot deals double damage.", "ru": "Ваш следующий выстрел наносит двойной урон."},
+	"item.roulette_handcuffs": {"de": "Handschellen", "en": "Handcuffs", "ru": "Наручники"},
+	"item.roulette_handcuffs_desc": {"de": "Der gewählte Gegner setzt seinen nächsten Zug aus.", "en": "The chosen opponent skips their next turn.", "ru": "Выбранный противник пропускает следующий ход."},
+	"item.roulette_medkit": {"de": "Verbandskasten", "en": "Medkit", "ru": "Аптечка"},
+	"item.roulette_medkit_desc": {"de": "Stellt 1 Leben wieder her, bis zum Maximum.", "en": "Restores 1 health, up to the maximum.", "ru": "Восстанавливает 1 единицу здоровья, не выше максимума."},
+	"roulette.shot_live": {"de": "💥 SCHARF — Spieler %d verliert %d Leben!", "en": "💥 LIVE — Player %d loses %d health!", "ru": "💥 БОЕВОЙ — игрок %d теряет %d ед. здоровья!"},
+	"roulette.shot_blocked": {"de": "🛡 SCHARF — die Weste fängt den Treffer ab!", "en": "🛡 LIVE — the vest absorbs the hit!", "ru": "🛡 БОЕВОЙ — бронежилет поглощает попадание!"},
+	"roulette.shot_blank": {"de": "💨 Platzpatrone", "en": "💨 Blank shell", "ru": "💨 Холостой патрон"},
+	"roulette.magazine_loaded": {"de": "🔫 Magazin geladen: %d scharf, %d Platz (%d Patronen)", "en": "🔫 Chamber loaded: %d live, %d blank (%d shells)", "ru": "🔫 Магазин заряжен: %d боевых, %d холостых (%d патронов)"},
+	"roulette.cuffed_turn": {"de": "Handschellen: Dein Zug wird ausgesetzt!", "en": "Handcuffs: your turn is skipped!", "ru": "Наручники: ваш ход пропускается!"},
+	"roulette.magnifier_live": {"de": "🔍 Lupe: Die nächste Patrone ist scharf.", "en": "🔍 Magnifier: the next shell is live.", "ru": "🔍 Лупа: следующий патрон боевой."},
+	"roulette.magnifier_blank": {"de": "🔍 Lupe: Die nächste Patrone ist eine Platzpatrone.", "en": "🔍 Magnifier: the next shell is blank.", "ru": "🔍 Лупа: следующий патрон холостой."},
+	}
 
 
 func _ready() -> void:

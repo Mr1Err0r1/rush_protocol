@@ -63,6 +63,8 @@ func _ready() -> void:
 	EventBus.player_eliminated.connect(_on_player_eliminated)
 	EventBus.player_location_changed.connect(_on_player_location_changed)
 	EventBus.risk_triggered.connect(_on_risk_triggered)
+	EventBus.roulette_shot.connect(_on_roulette_shot)
+	EventBus.roulette_reloaded.connect(_on_roulette_reloaded)
 	EventBus.item_used.connect(_on_item_used)
 	EventBus.item_given.connect(_on_item_given)
 	EventBus.match_over.connect(_on_match_over)
@@ -208,17 +210,43 @@ func _on_risk_triggered(_actor_id: int, _target_id: int, oid: StringName, value:
 	_outcome_timer.start()
 
 
+func _on_roulette_shot(_actor_id: int, target_id: int, live: bool, damage: int) -> void:
+	var text: String
+	var tone: String
+	if live and damage > 0:
+		text = LocaleManager.translate("roulette.shot_live", [target_id, damage])
+		tone = "lose"
+	elif live:
+		text = LocaleManager.translate("roulette.shot_blocked")
+		tone = "win"
+	else:
+		text = LocaleManager.translate("roulette.shot_blank")
+		tone = "info"
+	_show_toast(text, tone, 3.0)
+	outcome_lbl.text       = text
+	outcome_panel.visible  = true
+	outcome_panel.modulate = Color(1, 0.4, 0.4) if live and damage > 0 else Color(1, 1, 0.5)
+	_outcome_timer.start()
+
+
+func _on_roulette_reloaded(live: int, blank: int, total: int) -> void:
+	_show_toast(LocaleManager.translate("roulette.magazine_loaded", [live, blank, total]), "info", 4.0)
+
+
 func _on_item_used(player_id: int, item_id: StringName, _target_id: int, result: Dictionary) -> void:
 	if not result.get("success", false):
 		return
 	var idef  := ItemDatabase.get_item(item_id) as ItemDefinition
-	var iname := idef.display_name if idef else str(item_id)
+	var iname := _localized_item_name(item_id, idef)
 	var is_me := player_id == _local_player_id
-	_show_toast("%s used: %s" % ["You" if is_me else "Player %d" % player_id, iname], "info", 2.0)
+	var actor_label := LocaleManager.translate("hud.you") if is_me else LocaleManager.translate("hud.player", [player_id])
+	_show_toast(LocaleManager.translate("hud.item_used", [actor_label, iname]), "info", 2.0)
 	_update_hotbar_from_state()
 
-	# Private feedback: AI Lens reveals target info only to the local player
-	if item_id == &"ai_lens" and is_me and result.has("revealed"):
+	# Private feedback is shown only to the local player.
+	if item_id == &"magnifier" and is_me and result.get("is_private", false) and result.has("revealed"):
+		_show_magnifier_result(result["revealed"])
+	elif item_id == &"ai_lens" and is_me and result.get("is_private", false) and result.has("revealed"):
 		_show_lens_result(result["revealed"])
 
 
@@ -226,8 +254,8 @@ func _on_item_given(player_id: int, item_id: StringName, _source: String) -> voi
 	if player_id != _local_player_id:
 		return
 	var idef  := ItemDatabase.get_item(item_id) as ItemDefinition
-	var iname := idef.display_name if idef else str(item_id)
-	_show_toast("➕ Received: %s" % iname, "info", 2.0)
+	var iname := _localized_item_name(item_id, idef)
+	_show_toast(LocaleManager.translate("hud.item_received", [iname]), "info", 2.0)
 	_update_hotbar_from_state()
 
 
@@ -253,11 +281,12 @@ func _update_hotbar_from_state() -> void:
 	for i in _hotbar_slots.size():
 		var btn: Button = _hotbar_slots[i]
 		if i < items.size():
-			var idef         := ItemDatabase.get_item(items[i]) as ItemDefinition
-			btn.text         = idef.display_name if idef else str(items[i])
-			btn.tooltip_text = "[%d] %s" % [i + 1, idef.description if idef else ""]
+			var item_id: StringName = items[i]
+			var idef := ItemDatabase.get_item(item_id) as ItemDefinition
+			btn.text = _localized_item_name(item_id, idef)
+			btn.tooltip_text = "[%d] %s — %s" % [i + 1, btn.text, _localized_item_description(item_id, idef)]
 		else:
-			btn.text         = "—"
+			btn.text = "—"
 			btn.tooltip_text = "[%d] Empty" % (i + 1)
 
 
@@ -297,6 +326,35 @@ func _show_lens_result(revealed: Dictionary) -> void:
 		lines.append("  Inventory types: " + ", ".join(revealed["inventory_categories"]))
 	for line in lines:
 		_show_toast(line, "info", 4.0)
+
+
+func _show_magnifier_result(revealed: Dictionary) -> void:
+	var key := "roulette.magnifier_live" if revealed.get("shell", "blank") == "live" else "roulette.magnifier_blank"
+	_show_toast(LocaleManager.translate(key), "info", 4.0)
+
+
+func _localized_item_name(item_id: StringName, idef: ItemDefinition) -> String:
+	var key := ""
+	match item_id:
+		&"magnifier": key = "item.roulette_magnifier"
+		&"saw": key = "item.roulette_saw"
+		&"handcuffs": key = "item.roulette_handcuffs"
+		&"medkit": key = "item.roulette_medkit"
+	if not key.is_empty():
+		return LocaleManager.translate(key)
+	return idef.display_name if idef != null else str(item_id)
+
+
+func _localized_item_description(item_id: StringName, idef: ItemDefinition) -> String:
+	var key := ""
+	match item_id:
+		&"magnifier": key = "item.roulette_magnifier_desc"
+		&"saw": key = "item.roulette_saw_desc"
+		&"handcuffs": key = "item.roulette_handcuffs_desc"
+		&"medkit": key = "item.roulette_medkit_desc"
+	if not key.is_empty():
+		return LocaleManager.translate(key)
+	return idef.description if idef != null else ""
 
 
 # ── Game over ─────────────────────────────────────────────────────────────────

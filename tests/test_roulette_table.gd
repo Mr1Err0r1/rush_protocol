@@ -36,6 +36,7 @@ func _ready() -> void:
 	test_shooting_rules()
 	test_turn_order_and_elimination()
 	test_items()
+	test_shield_and_sync()
 	test_signals()
 	test_fuzz()
 	test_level_difficulty()
@@ -228,6 +229,48 @@ func test_items() -> void:
 	t = _table({1: 1, 2: 1}, 1, 0)
 	t.shoot(1, 2)
 	check(t.use_peek(1) == ShellChamber.NONE and not t.use_saw(1) and t.use_heal(1) == 0, "Items nach Tischende wirkungslos")
+
+
+func test_shield_and_sync() -> void:
+	# Weste fängt genau einen Treffer ab
+	var t := _table({1: 3, 2: 3}, 4, 0)
+	t.set_shield(2, true)
+	check(t.has_shield(2), "Weste gesetzt")
+	var r := t.shoot(1, 2)
+	check(r["live"] and r["absorbed"] and r["damage"] == 0 and t.hp[2] == 3 and not t.has_shield(2), "Weste: Treffer abgefangen und verbraucht")
+	r = t.shoot(2, 1)
+	r = t.shoot(1, 2)
+	check(r["damage"] == 1 and not r["absorbed"] and t.hp[2] == 2, "ohne Weste trifft der nächste Schuss")
+	# Weste schützt auch vor dem eigenen Schuss
+	t = _table({1: 3, 2: 3}, 3, 0)
+	t.set_shield(1, true)
+	r = t.shoot(1, 1)
+	check(r["absorbed"] and t.hp[1] == 3, "Weste schützt auch vor dem Selbstschuss")
+	# Platzpatrone verbraucht die Weste nicht
+	t = _table({1: 3, 2: 3}, 0, 3)
+	t.set_shield(2, true)
+	t.shoot(1, 2)
+	check(t.has_shield(2), "Platzpatrone verbraucht die Weste nicht")
+	# Weste für Unbekannte wird ignoriert; Weste verfällt, wenn der Spieler ausscheidet
+	t.set_shield(9, true)
+	check(not t.has_shield(9), "Weste für Fremde ignoriert")
+
+	# drop(): Spieler von außen entfernen → Sieger, wenn nur einer übrig
+	t = _table({1: 3, 2: 3, 3: 3}, 3, 3)
+	t.drop(2)
+	check(t.alive_ids() == [1, 3] and not t.is_over(), "drop entfernt Spieler 2")
+	t.drop(3)
+	check(t.is_over() and t.winner_id == 1, "drop des vorletzten Spielers → Sieger 1")
+	t.drop(77)   # unbekannt: kein Fehler
+
+	# sync_player: Leben/Maximum von außen setzen; hp <= 0 nimmt vom Tisch
+	t = _table({1: 3, 2: 3}, 3, 3)
+	t.sync_player(1, 2, 5)
+	check(t.hp[1] == 2 and t.max_hp[1] == 5, "sync_player setzt Leben und Maximum")
+	t.sync_player(1, 7, 5)
+	check(t.max_hp[1] == 7, "Maximum wächst mit, wenn Leben darüber liegen")
+	t.sync_player(2, 0, 3)
+	check(not t.is_alive(2) and t.winner_id == 1, "sync_player mit 0 Leben scheidet aus")
 
 
 func test_signals() -> void:
