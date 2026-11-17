@@ -20,6 +20,7 @@ func _run_tests() -> void:
 	_check(selector.class_list.item_count >= 1, "A selected faction must expose its playable roles")
 	_check(selector._selected_class_id != &"", "The first role must be selected for preview")
 	_check(selector._gender_buttons.has("nb"), "The gender selector must include a non-binary option")
+	var faction_labels := {"en": "Intelligence", "de": "Geheimdienst", "ru": "Спецслужбы"}
 	var previous_locale := LocaleManager.current_locale
 	for locale in ["en", "de", "ru"]:
 		LocaleManager.current_locale = locale
@@ -27,6 +28,8 @@ func _run_tests() -> void:
 			"Faction step label must be translated for " + locale)
 		_check(LocaleManager.translate("character.gender_nb") != "character.gender_nb",
 			"Non-binary label must be translated for " + locale)
+		_check(LocaleManager.translate("character.faction_government") == faction_labels[locale],
+			"Government/intelligence faction label must be localized for " + locale)
 	LocaleManager.current_locale = previous_locale
 	print("PASS faction-first onboarding tests")
 	get_tree().quit(0)
