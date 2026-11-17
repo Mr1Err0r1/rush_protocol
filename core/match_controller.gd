@@ -322,6 +322,14 @@ func request_use_item(user_id: int, item_id: StringName, target_id: int) -> Dict
 		_apply_zone_noise(result["noise_zone"], result["noise_suspicion"], user_id)
 
 	_check_win_conditions()
+
+	# Hat sich der Benutzer durch den Einsatz selbst aus dem Spiel genommen (z. B. Misstrauen am
+	# Maximum → Rauswurf), darf der Zug nicht bei ihm hängen bleiben.
+	if user_state.is_eliminated and current_phase == Phase.CASINO_FLOOR \
+			and get_active_player_id() == user_id:
+		if not (target_id == user_id and user_state.health != health_before):   # sonst oben schon gemeldet
+			EventBus.player_eliminated.emit(user_id, -1, user_state.elimination_cause)
+		_end_turn()
 	return result
 
 
