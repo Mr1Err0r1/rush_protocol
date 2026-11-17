@@ -4,6 +4,7 @@ extends Node
 
 const FACTIONS := ["military", "mafia", "law_enforcement", "government", "elite", "civilian", "assassins"]
 const CATEGORIES := ["weapon", "gadget", "intel", "tool", "disguise", "chip"]
+const UI_GENDERS := ["m", "f", "nb"]
 const MIN_ROLES_PER_FACTION := {"military": 3, "mafia": 3, "government": 2, "civilian": 3}
 
 var _checks := 0
@@ -41,6 +42,8 @@ func _ready() -> void:
 		seen[id] = true
 		check(FACTIONS.has(str(cc.faction_id)), "%s: unbekannte Fraktion %s" % [id, cc.faction_id])
 		check(cc.display_name != "" and cc.display_name != "Unbekannt", id + ": display_name fehlt")
+		for gender in cc.gender_options:
+			check(UI_GENDERS.has(str(gender)), "%s: Genderoption wird von der Auswahl-UI nicht unterstützt: %s" % [id, gender])
 		check(cc.lore_text.length() > 20, id + ": lore_text zu kurz")
 		check(cc.start_health >= 1 and cc.start_health <= 10, id + ": start_health außerhalb 1..10")
 		check(cc.smuggle_slots >= 0 and cc.smuggle_slots <= 4, id + ": smuggle_slots außerhalb 0..4")
