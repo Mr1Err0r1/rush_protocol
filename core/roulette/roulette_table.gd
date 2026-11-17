@@ -182,7 +182,7 @@ func use_cuff(actor_id: int, target_id: int) -> bool:
 
 ## Verbandskasten: heilt bis max_hp. Gibt die tatsächliche Heilung zurück.
 func use_heal(actor_id: int, amount: int = 1) -> int:
-	if is_over() or not is_alive(actor_id):
+	if is_over() or not is_alive(actor_id) or amount <= 0:
 		return 0
 	var before: int = hp[actor_id]
 	hp[actor_id] = mini(before + amount, int(max_hp[actor_id]))

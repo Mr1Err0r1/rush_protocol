@@ -32,6 +32,7 @@ func _table(hp: Dictionary, live: int, blank: int, lvl: int = 1, seed_value: int
 func _ready() -> void:
 	test_chamber()
 	test_load_for_level()
+	test_empty_setup()
 	test_shooting_rules()
 	test_turn_order_and_elimination()
 	test_items()
@@ -95,6 +96,13 @@ func test_load_for_level() -> void:
 		check(absf(avg - RouletteTable.LIVE_RATIO_BY_LEVEL[lvl - 1]) < 0.06, "Level %d: scharfer Anteil ≈ %.2f (ist %.3f)" % [lvl, RouletteTable.LIVE_RATIO_BY_LEVEL[lvl - 1], avg])
 	check(RouletteTable.load_for_level(0, r)["total"] == 4, "Level 0 wird auf 1 begrenzt")
 	check(RouletteTable.load_for_level(99, r)["total"] == 8, "Level 99 wird auf 5 begrenzt")
+
+
+func test_empty_setup() -> void:
+	var t := RouletteTable.new(_rng(17))
+	t.setup({})
+	check(t.is_over() and t.current_player() == -1 and t.winner_id == -1,
+		"leerer Tisch ist beendet und hat keinen Sieger")
 
 
 func test_shooting_rules() -> void:
@@ -202,6 +210,11 @@ func test_items() -> void:
 	check(t.use_heal(1, 1) == 0, "volle Leben: keine Heilung")
 	t.shoot(1, 1)                      # 1 → 2 Leben
 	check(t.use_heal(1, 5) == 1 and t.hp[1] == 3, "Heilung nur bis Maximum")
+	t = _table({1: 1, 2: 3}, 0, 3)
+	check(t.use_heal(1, -1) == 0 and t.hp[1] == 1 and t.is_alive(1),
+		"negative Heilung wird abgelehnt und lässt den Spieler am Leben")
+	check(t.use_heal(1, 0) == 0 and t.hp[1] == 1,
+		"Heilung um null verändert keine Leben")
 
 	# Auswerfen
 	t = _table({1: 3, 2: 3}, 1, 1)
