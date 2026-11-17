@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"civilian_gambler"
+faction_id = &"civilian"
+display_name = "Zocker"
+lore_text = "Du bist wegen des Nervenkitzels hier. Ein dicker Chipstapel, eine Glücksmünze und das Gefühl, dass heute Nacht alles möglich ist – auch der ganz große Gewinn."
+gender_options = ["m", "f", "nb"]
+start_health = 4
+start_suspicion = 0
+start_heat = 1
+start_influence = 1
+start_chips = 100
+smuggle_slots = 2
+guaranteed_items = [&"coin"]
+allowed_item_categories = ["chip", "tool", "disguise"]
+detection_resistance = 0.0
+entry_bonus_id = &"bonus_dealer_bribed"
+passive_ability_id = &"passive_high_roller"
+active_ability_id = &"active_wild_card"
+primary_objective = "control_casino"
+unlocked_by_default = true

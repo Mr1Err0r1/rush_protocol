@@ -142,7 +142,7 @@ const _T: Dictionary = {
 		"character.faction_military": {"de": "Militär", "en": "Military", "ru": "Военные"},
 		"character.faction_civilian": {"de": "Zivilisten", "en": "Civilians", "ru": "Мирные жители"},
 		"character.faction_assassins": {"de": "Assassinen-Gilde", "en": "Assassins' Guild", "ru": "Гильдия ассасинов"},
-		"character.faction_government": {"de": "Regierung", "en": "Government", "ru": "Правительство"},
+		"character.faction_government": {"de": "Geheimdienst", "en": "Intelligence", "ru": "Спецслужбы"},
 		"character.faction_law_enforcement": {"de": "Ermittler", "en": "Investigators", "ru": "Следователи"},
 		"character.faction_elite": {"de": "Casino-Elite", "en": "Casino Elite", "ru": "Элита казино"},
 		"character.faction_independent": {"de": "Unabhängig", "en": "Independent", "ru": "Независимые"},

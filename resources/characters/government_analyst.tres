@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterClass" load_steps=2 format=3]
+[ext_resource type="Script" path="res://core/character_class.gd" id="1"]
+[resource]
+script = ExtResource("1")
+class_id = &"government_analyst"
+faction_id = &"government"
+display_name = "Analyst"
+lore_text = "Du kommst nicht mit der Waffe, sondern mit Daten. Dein Platz ist im Hintergrund: Muster erkennen, Verdächtige einordnen und rechtzeitig verschwinden, bevor jemand fragt, wer du bist."
+gender_options = ["m", "f", "nb"]
+start_health = 3
+start_suspicion = 0
+start_heat = 0
+start_influence = 3
+start_chips = 70
+smuggle_slots = 3
+guaranteed_items = [&"ai_lens"]
+allowed_item_categories = ["intel", "gadget"]
+detection_resistance = 0.1
+entry_bonus_id = &"bonus_clearance_level"
+passive_ability_id = &"passive_counter_intel"
+active_ability_id = &"active_extraction"
+primary_objective = "survive_undetected"
+unlocked_by_default = true
