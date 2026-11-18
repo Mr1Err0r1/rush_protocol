@@ -32,6 +32,12 @@ var _round_index: int         = 0
 var _actions_this_turn: int   = 0
 var _boss_health:        int   = 8
 
+# ── Item-Wahl pro Runde (item_mode "draft") ───────────────────────────────────
+var _draft_active: bool = false
+var _draft_offers: Dictionary = {}   # player_id → Array[StringName]
+var _draft_picks: Dictionary = {}    # player_id → verbleibende Auswahl
+var _draft_rng: RandomNumberGenerator = null
+
 # ── Sub-Controller ────────────────────────────────────────────────────────────
 @onready var risk_controller:  RiskController       = $RiskController
 @onready var entry_controller: EntryPhaseController = $EntryPhaseController
@@ -199,7 +205,10 @@ func _start_round() -> void:
 	_turn_index     = 0
 	_actions_this_turn = 0
 
-	# Items verteilen
+	# Items verteilen: zufällig (klassisch) oder per Auswahl (item_mode "draft")
+	if match_config.get("item_mode", "random") == "draft":
+		_begin_item_draft()
+		return
 	_distribute_round_items()
 
 	EventBus.round_started.emit(_round_index, get_active_player_id())
@@ -227,6 +236,8 @@ func _start_turn() -> void:
 
 
 func advance_turn_phase() -> void:
+	if _draft_active:
+		return
 	match current_turn_phase:
 		TurnPhase.ITEM:
 			current_turn_phase = TurnPhase.ACTION
@@ -282,6 +293,8 @@ func _advance_to_next_player() -> void:
 func request_use_item(user_id: int, item_id: StringName, target_id: int) -> Dictionary:
 	if not _is_authority():
 		return {}
+	if _draft_active:
+		return {"success": false, "reason": "draft_active"}
 	if get_active_player_id() != user_id:
 		EventBus.item_use_failed.emit(user_id, item_id, "not_your_turn")
 		return {"success": false, "reason": "not_your_turn"}
@@ -349,6 +362,8 @@ func request_use_item(user_id: int, item_id: StringName, target_id: int) -> Dict
 func request_risk_action(actor_id: int, target_id: int) -> Dictionary:
 	if not _is_authority():
 		return {}
+	if _draft_active:
+		return {"success": false, "reason": "draft_active"}
 	if get_active_player_id() != actor_id:
 		return {"success": false, "reason": "not_your_turn"}
 	if current_turn_phase != TurnPhase.ACTION:
@@ -391,6 +406,8 @@ func request_risk_action(actor_id: int, target_id: int) -> Dictionary:
 
 
 func request_move_zone(player_id: int, target_zone: String) -> bool:
+	if _draft_active:
+		return false
 	var state := get_state(player_id)
 	if state == null or state.is_eliminated:
 		return false
@@ -508,6 +525,98 @@ func _distribute_round_items() -> void:
 			var random_id: StringName = available_ids[randi() % available_ids.size()]
 			state.add_item(random_id)
 			EventBus.item_given.emit(state.player_id, random_id, "round_distribution")
+
+
+func is_draft_active() -> bool:
+	return _draft_active
+
+
+func get_draft_offers(player_id: int) -> Array:
+	return _draft_offers.get(player_id, [])
+
+
+func get_draft_picks_left(player_id: int) -> int:
+	return _draft_picks.get(player_id, 0)
+
+
+func _begin_item_draft() -> void:
+	if _draft_rng == null:
+		_draft_rng = RandomNumberGenerator.new()
+		if match_config.has("draft_seed"):
+			_draft_rng.seed = int(match_config["draft_seed"])
+		else:
+			_draft_rng.randomize()
+	_draft_active = true
+	_draft_offers.clear()
+	_draft_picks.clear()
+	var capacity: int = match_config.get("inventory_capacity", ItemDraft.INVENTORY_CAPACITY)
+	var offer_count: int = match_config.get("draft_offers", ItemDraft.DEFAULT_OFFERS)
+	var pick_count: int = match_config.get("draft_picks", ItemDraft.DEFAULT_PICKS)
+
+	for pid in _turn_order:
+		var state := get_state(pid)
+		if state == null or state.is_eliminated:
+			continue
+		var cc: CharacterClass = get_character_class(state.char_class_id)
+		var picks := ItemDraft.picks_for(state, pick_count, capacity)
+		if picks <= 0:
+			continue   # Inventar voll: nichts zu wählen
+		# Roulette-Items nur anbieten, wenn ein Roulette-Tisch läuft (get() ist null, wenn es ihn nicht gibt)
+		var offers := ItemDraft.build_offers(cc, offer_count, _draft_rng, get("roulette") != null)
+		if offers.is_empty():
+			continue
+		if state.is_ai:
+			for item_id in ItemDraft.auto_pick(cc, offers, picks, _draft_rng):
+				state.add_item(item_id)
+				EventBus.item_given.emit(pid, item_id, "draft")
+			continue
+		_draft_offers[pid] = offers
+		_draft_picks[pid] = picks
+	for pid in _draft_offers.keys():
+		EventBus.item_draft_offered.emit(pid, _draft_offers[pid], _draft_picks[pid])
+	_maybe_finish_draft()
+
+
+## Wahl eines Angebots. Ergebnis: {"success": bool, "reason": String, "picks_left": int}
+func request_draft_pick(player_id: int, item_id: StringName) -> Dictionary:
+	if not _is_authority():
+		return {}
+	if not _draft_active or not _draft_offers.has(player_id):
+		return {"success": false, "reason": "no_draft"}
+	var state := get_state(player_id)
+	var capacity: int = match_config.get("inventory_capacity", ItemDraft.INVENTORY_CAPACITY)
+	var v := ItemDraft.validate_pick(state, _draft_offers[player_id], item_id, _draft_picks[player_id], capacity)
+	if not v["ok"]:
+		return {"success": false, "reason": v["reason"], "picks_left": _draft_picks[player_id]}
+	state.add_item(item_id)
+	_draft_offers[player_id].erase(item_id)
+	_draft_picks[player_id] -= 1
+	EventBus.item_given.emit(player_id, item_id, "draft")
+	EventBus.item_draft_picked.emit(player_id, item_id)
+	var left: int = _draft_picks[player_id]
+	if left <= 0 or ItemDraft.free_slots(state, capacity) <= 0 or _draft_offers[player_id].is_empty():
+		_draft_offers.erase(player_id)
+		_draft_picks.erase(player_id)
+	_maybe_finish_draft()
+	return {"success": true, "reason": "", "picks_left": left}
+
+
+## Restliche Auswahl verfallen lassen.
+func request_draft_done(player_id: int) -> void:
+	if not _is_authority() or not _draft_active:
+		return
+	_draft_offers.erase(player_id)
+	_draft_picks.erase(player_id)
+	_maybe_finish_draft()
+
+
+func _maybe_finish_draft() -> void:
+	if not _draft_active or not _draft_offers.is_empty():
+		return
+	_draft_active = false
+	EventBus.item_draft_finished.emit(_round_index)
+	EventBus.round_started.emit(_round_index, get_active_player_id())
+	_start_turn()
 
 
 func _check_win_conditions() -> void:

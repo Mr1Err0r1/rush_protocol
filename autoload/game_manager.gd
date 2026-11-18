@@ -160,6 +160,11 @@ func _default_match_config() -> Dictionary:
 		"items_per_round": 2,         # Wie viele Items zu Rundenstart ausgeteilt werden
 		"risk_pool_positive": 4,      # Wie viele "positive" Outcomes im Pool
 		"risk_pool_negative": 6,
+		# "random" = Items werden zufällig ausgeteilt (klassisch), "draft" = Spieler wählen pro Runde aus einem Angebot.
+		# Schnelltest: Spiel mit  -- --draft  starten.
+		"item_mode": "draft" if "--draft" in OS.get_cmdline_user_args() else "random",
+		"draft_picks": 2,
+		"draft_offers": 4,
 		"allow_self_target": true,
 		# "pool" = Chips-Pool (klassisch), "shells" = Roulette mit scharfen/Platzpatronen.
 		# Schnelltest: Spiel mit  -- --roulette  starten.
