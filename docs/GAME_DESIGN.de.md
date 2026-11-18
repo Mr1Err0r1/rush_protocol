@@ -1,100 +1,103 @@
-# Rush Protocol – Spieldesign: Roulette-Schleife
+# Rush Protocol — Spieldesign: Casino-Risikoschleife
 
-Inspiriert von *Buckshot Roulette*: wenige Regeln, hohe Spannung, bekannte Wahrscheinlichkeiten, verborgene Reihenfolge.
-Dieses Dokument beschreibt Ziel, aktuellen Umsetzungsstand und die offenen Punkte.
-Alle Zahlen unten stammen aus dem Code (`CheckpointRules`, `RouletteTable`, `ItemDraft`) und sind durch Tests abgesichert.
+**Sprachen:** [English (canonical)](GAME_DESIGN.md) · Deutsch · [Русский](GAME_DESIGN.ru.md)
 
-## Die Spielschleife
+Inspiriert von *Buckshot Roulette*: wenige Regeln, steigende Spannung, sichtbare Wahrscheinlichkeiten und eine verborgene Reihenfolge. Diese Referenz unterscheidet implementiertes Prototypverhalten von geplanter Arbeit. Die Zahlen und Standardwerte beruhen auf dem aktuellen Code (`CheckpointRules`, `RouletteTable`, `ItemDraft` und `GameManager`).
 
-1. **Fraktion und Rolle wählen** – z. B. Militär → Leutnant oder Soldat, Geheimdienst → Agent oder Analyst, Zivilisten (Normalbürger, Journalist, Zocker), Mafia → Boss, Capo, Schläger, Buchhalter.
-2. **Items packen** – Rolle bestimmt Startkapital, Schmuggel-Slots und erlaubte Item-Kategorien.
-3. **Einlasskontrolle am Casino** – jedes Schmuggel-Item wird mit einer Wahrscheinlichkeit gefunden (Rolle, Misstrauen, Item).
-4. **Etage 1: erste Runde** – Item-Wahl (Draft), danach Züge am Tisch.
-5. **Aufstieg** – beim ersten Betreten höherer Etagen kann eine **Etagenkontrolle** auslösen; das Penthouse wird immer kontrolliert.
-6. **Je höher, desto gefährlicher** – das Magazin wird größer und enthält mehr scharfe Patronen.
+## Kernablauf
+
+1. **Fraktion und Rolle wählen.** Der Fraktion-zuerst-Assistent filtert die Rollen nach der gewählten Gruppe.
+2. **Loadout vorbereiten.** Rollen legen Startressourcen, Schmuggel-Slots, garantierte Items und Kategorieeinschränkungen fest.
+3. **Einlasskontrolle bestehen.** Nicht garantierte Schmuggel-Items können entdeckt und beschlagnahmt werden; ein Rauswurf kann einen Spieler eliminieren.
+4. **Eine Runde spielen.** Standardmäßig werden Items zufällig verteilt; alternativ können Spieler den optionalen Item-Draft nutzen.
+5. **Den Turm durchqueren.** Beim ersten Betreten eines Kontrollpunkts auf einer oberen Etage kann eine Kontrolle ausgelöst werden; im Penthouse ist sie obligatorisch.
+6. **Einsatz erhöhen.** Im optionalen Patronen-Risikomodus enthalten die Magazine auf höheren Etagen mehr Patronen und einen höheren Anteil scharfer Patronen.
+7. **Um das Ziel konkurrieren.** Last-Man-Standing- und Tresor-Zielsieglogik existiert; die vollständige Bossbegegnung ist noch in Entwicklung.
 
 ## Fraktionen und Rollen
 
-| Fraktion (UI) | Rollen |
+| Fraktion | Aktuell in Charakterressourcen vorhandene Rollen |
 |---|---|
 | Militär | Militärischer Einsatzleiter, Leutnant, Soldat |
 | Geheimdienst | Agent, Analyst |
 | Zivilisten | Normalbürger, Journalist, Zocker |
 | Mafia | Mafia-Boss, Capo, Schläger, Buchhalter |
-| Elite / Polizei / Assassinen | Millionär / Verdeckter Ermittler / Assassine |
+| Casino-Elite | Millionär |
+| Ermittler | Verdeckter Ermittler |
+| Assassinen-Gilde | Assassine |
 
-Rollen sind reine Daten (`resources/characters/*.tres`) und erscheinen automatisch in Auswahl und Galerie.
-**Hinweis:** Die Fähigkeits-IDs (`passive_*`, `active_*`, `bonus_*`) sind aktuell nur Daten und noch nicht im Code umgesetzt.
+Rollenressourcen liegen unter `resources/characters/*.tres` und werden in Auswahl und Galerie geladen. Einige Fähigkeits- und Ziel-IDs sind noch reine Daten und dürfen nicht mit fertig implementierten Fraktionsfähigkeiten verwechselt werden.
 
-## Kontrollen (Wahrscheinlichkeiten)
+## Sicherheitskontrollen
 
-Chance, dass beim **ersten Betreten** einer Etage kontrolliert wird (Misstrauen 0, Heat 0). Misstrauen erhöht sie um 3 %, Heat um 2 % pro Punkt.
+Die Einlasskontrolle findet nach der Loadout-Auswahl immer statt. Die Tabelle zeigt die Wahrscheinlichkeit, dass ein Kontrollpunkt auf einer oberen Etage **beim ersten Betreten** ausgelöst wird, bei null Misstrauen und null Heat. Die Durchwinkchance der Fraktion ist bereits berücksichtigt; die Penthouse-Kontrolle ist obligatorisch. Der Wert 28,5 % wird exakt angegeben.
 
-| Fraktion | Salon | Hinterzimmer | Tresor-Korridor | Penthouse | Durchwinken |
-|---|---|---|---|---|---|
-| Zivilisten | 19 % | 28 % | 38 % | 100 % | 5 % |
+| Fraktion | Salon / VIP | Hinterzimmer | Tresor-Korridor | Penthouse | Durchwinkchance |
+|---|---:|---:|---:|---:|---:|
+| Zivilisten | 19 % | 28,5 % | 38 % | 100 % | 5 % |
 | Mafia | 18 % | 27 % | 36 % | 100 % | 10 % |
 | Militär | 18 % | 27 % | 36 % | 100 % | 10 % |
 | Geheimdienst | 14 % | 21 % | 28 % | 100 % | 30 % |
-| Polizei | 16 % | 24 % | 32 % | 100 % | 20 % |
-| Elite | 12 % | 18 % | 24 % | 100 % | 40 % |
-| Assassinen | 20 % | 30 % | 40 % | 100 % | 0 % |
+| Ermittler | 16 % | 24 % | 32 % | 100 % | 20 % |
+| Casino-Elite | 12 % | 18 % | 24 % | 100 % | 40 % |
+| Assassinen-Gilde | 20 % | 30 % | 40 % | 100 % | 0 % |
 
-Wird kontrolliert, hat jedes Schmuggel-Item eine **Fundchance** (Einlass, Zivilist, Misstrauen 0):
-Revolver 85 %, Vault-Schlüssel-Kopie 90 %, Schutzband 65 %, Rauchgranate 55 %, Präparierte Karten 30 %, Gefälschter Ausweis 20 %,
-Fake-Chip 15 %, Giftnadel 10 %, Kleber 8 %, Feuerzeug 5 %, Abhörwanze 3 %, KI-Linse 2 %.
-Fraktionen verstecken Kategorien besser (z. B. Militär Waffen ×0,7, Geheimdienst Intel ×0,5, Assassinen Waffen ×0,4); `detection_resistance` der Rolle senkt die Chance zusätzlich.
-Etagenkontrollen sind strenger als der Einlass, je höher die Etage (Salon ×0,6 … Penthouse ×1,5).
+Jeder Misstrauenspunkt addiert 3 Prozentpunkte, jeder Heat-Punkt 2 Prozentpunkte zur Auslösewahrscheinlichkeit; bei nicht obligatorischen Kontrollen wird danach der Fraktions-Durchwinkfaktor angewendet und das Ergebnis auf 0–100 % begrenzt. Rollenspezifische Einstellungen können Teile des Fraktionsprofils überschreiben.
 
-Ergebnis: *nichts gefunden* · *beschlagnahmt* · bei ≥ 2 Funden ohne Bestechung (Einfluss ≥ 4) **zurückgeschickt** (Heat +1).
+Bei einer Kontrolle gelten für den Einlass (Etagenstrenge 1,0) folgende **Basis-Fundchancen**, bevor Misstrauen, Rollenresistenz oder Fraktionsverdeckung einfließen. Itemkategorie, Misstrauen, Rolle und Etagenstrenge können die endgültige Chance verändern.
 
-## Roulette-Modus (`risk_mode = "shells"`)
+| Item | Basis-Fundchance |
+|---|---:|
+| Revolver | 85 % |
+| Kopie des Tresorschlüssels | 90 % |
+| Schutzband | 65 % |
+| Rauchgranate | 55 % |
+| Präparierte Karten | 30 % |
+| Gefälschter Ausweis | 20 % |
+| Falschmünze / Fake-Chip | 15 % |
+| Giftnadel | 10 % |
+| Kleber | 8 % |
+| Feuerzeug | 5 % |
+| Abhörwanze | 3 % |
+| KI-Linse | 2 % |
 
-- Das Magazin enthält **scharfe** und **Platzpatronen**. Die Anzahlen werden angesagt, die Reihenfolge bleibt verborgen.
-- Wer am Zug ist, schießt auf einen Gegner **oder auf sich selbst**.
-- Scharf: Ziel verliert 1 Leben (2 mit Säge). Platzpatrone: nichts.
-- **Platzpatrone auf sich selbst → Extra-Aktion.** Alles andere beendet den Zug.
-- Leeres Magazin → neu laden, Anzahlen werden erneut angesagt.
+Beispiele für Fraktionsverdeckung: Militärwaffen ×0,7, Geheimdienst-Intel ×0,5 und Waffen der Assassinen-Gilde ×0,4. `detection_resistance` einer Rolle senkt die Fundchance. Etagen-Multiplikatoren der Fundchance: Salon ×0,6, Hinterzimmer ×0,9, Tresor-Korridor ×1,2 und Penthouse ×1,5.
 
-| Etage | Patronen | scharf (Ø) |
-|---|---|---|
-| 1 Lobby | 4 | 1,6 |
-| 2 Salon | 5 | 2,3 |
-| 3 Hinterzimmer | 6 | 3,0 |
-| 4 Tresor-Korridor | 7 | 3,9 |
-| 5 Penthouse | 8 | 4,8 |
+Eine Kontrolle ohne Fund beschlagnahmt nichts; gefundener Schmuggel wird entfernt. Bei der Einlasskontrolle führen das Erreichen des Misstrauenslimits oder mindestens zwei Funde ohne gültige Bestechung zum Rauswurf und zur Eliminierung. An oberen Etagen-Kontrollpunkten schickt das Finden von mindestens zwei Items ohne Bestechung den Spieler normalerweise zurück und erhöht Heat um 1; wird dabei das Misstrauenslimit erreicht, hat der Rauswurf Vorrang. Eine gültige Bestechung erfordert die Falschmünze im Inventar oder mindestens 4 Einfluss. Ausgeworfene Spieler können sich nicht weiterbewegen und keine Tresor-/Boss-Effekte auslösen.
 
-Die Stufe richtet sich nach der **höchsten Etage eines lebenden Spielers**.
+## Optionaler Patronen-Risikomodus (`risk_mode = "shells"`)
 
-Roulette-Items (nur in diesem Modus im Umlauf): **Lupe** (aktuelle Patrone ansehen), **Säge** (nächster Schuss doppelt),
-**Handschellen** (Gegner setzt aus), **Verbandskasten** (+1 Leben). Die Schutzweste fängt einen Treffer ab.
+Standardmäßig bleibt der Chip-Pool aktiv. Für einen lokalen/Solo-Schnelltest kann `--roulette` hinter dem `--`-Trenner von Godot angegeben werden; dadurch wird `shells` in der Match-Konfiguration gesetzt.
 
-## Item-Wahl pro Runde (`item_mode = "draft"`)
+| Höchste Etage eines lebenden Spielers | Patronen im Magazin | Erwartete scharfe Patronen |
+|---|---:|---:|
+| 1 — Lobby | 4 | 1,6 |
+| 2 — Salon | 5 | 2,3 |
+| 3 — Hinterzimmer | 6 | 3,0 |
+| 4 — Tresor-Korridor | 7 | 3,9 |
+| 5 — Penthouse | 8 | 4,8 |
 
-Statt Zufallsausgabe bekommt jeder Spieler ein Angebot (4 Items, Rollenkategorien 3× wahrscheinlicher) und wählt 2.
-Das Inventar fasst 8 Items; ist es voll, entfällt die Wahl. KI-Spieler wählen automatisch.
+Die Anzahl scharfer Patronen und Platzpatronen wird beim Laden/Nachladen angesagt; ihre Reihenfolge bleibt verborgen. Ein scharfer Schuss verursacht 1 Schaden (2 mit aktiver Säge); eine Platzpatrone verursacht keinen Schaden. Eine auf sich selbst abgefeuerte Platzpatrone gewährt eine Extra-Aktion; andere Schüsse beenden den Zug. Die Säge wird mit dem nächsten Schuss verbraucht, auch wenn es eine Platzpatrone ist. Die Lupe verrät ihrem Benutzer die aktuelle Patrone, Handschellen lassen ein Ziel einen Zug aussetzen, und ein Verbandskasten heilt bis zum Rollenmaximum. Ein Schutzschild kann einen Treffer abfangen. Dies ist ein kompakter Patronen-Risikomodus und kein vollständiges Poker- oder Blackjack-Tischspiel.
 
-## Modi ausprobieren
+## Optionaler Item-Draft pro Runde (`item_mode = "draft"`)
 
-```text
-godot --path . -- --roulette --draft
-```
-Entspricht `risk_mode = "shells"` und `item_mode = "draft"` in der Match-Config (`GameManager._default_match_config()`).
-Weitere Schalter: `checkpoints` (Etagenkontrollen, Standard `true`), `roulette_seed` / `draft_seed` (reproduzierbar), `inventory_capacity`.
+Standardmäßig bleibt die zufällige Itemverteilung aktiv. Für einen lokalen/Solo-Schnelltest kann `--draft` hinter dem `--`-Trenner von Godot angegeben werden. Jeder Spieler erhält vier unterschiedliche Angebote; Items aus einer rollengerechten Kategorie haben das dreifache Auswahlgewicht. Ein Spieler kann bis zu zwei Items wählen, begrenzt durch freie Inventarplätze. Das Standard-Inventarlimit beträgt acht; bei vollem Inventar entfällt der Draft. KI-Spieler wählen automatisch, und die Runde wartet mit dem Zugstart, bis alle ausstehenden menschlichen Auswahlen abgeschlossen sind.
 
-## Tests
+Beide Modus-Flags lassen sich kombinieren:
 
 ```bash
-bash tests/run_tests.sh      # Godot 4.7 im PATH oder GODOT=/pfad/zu/godot
+godot --path . -- --roulette --draft
 ```
-Testet u. a. Rollen-Daten, Kontrollwahrscheinlichkeiten, den Roulette-Kern (2.000 Zufallsspiele), den Roulette-Modus im MatchController
-(Hunderte simulierte Komplettspiele) und den Draft inklusive UI.
 
-## Offene Punkte (siehe Issues)
+Zu den erweiterten Match-Konfigurationsschlüsseln gehören `checkpoints`, `roulette_seed`, `draft_seed` und `inventory_capacity`; das sind Konfigurationswerte und keine zusätzlichen Kommandozeilen-Flags. Der Draft ist derzeit für Solo/Lokal/Hotseat implementiert. Eine Modusauswahl im Spielmenü und eine autoritative Online-Synchronisierung des Drafts sind noch Folgearbeiten.
 
-- Charaktermodelle pro Rolle und **Personalisierung**, die tatsächlich am Modell sichtbar ist (die aktuelle Auswahl hat noch keine Wirkung).
-- Fähigkeiten der Rollen umsetzen.
-- Klügere KI für den Roulette-Modus (nutzt die angesagten Anzahlen).
-- Menüschalter für Modi, Magazin-Anzeige im HUD, 3D-Präsentation (Waffe, Animationen).
-- Zusammenspiel von Etagen-Aufstieg, Tischen und Boss im Roulette-Modus.
-- Draft/Roulette online (Spieler-ID ↔ Peer), Inventar-Verwaltung (Items ablegen).
+## Tests und Grenzen
+
+Verhaltens-/Regressionstests und Szenen-Smoke-Checks mit Godot 4.7.2 oder neuer ausführen:
+
+```bash
+GODOT=/pfad/zu/godot bash tests/run_tests.sh
+GODOT_BIN=/pfad/zu/godot bash scripts/test/run_headless_smoke.sh
+```
+
+GitHub Actions führt die Regressionstests mit Godot 4.7.2-stable aus und schlägt fehl, wenn der Runner oder alle Testfälle fehlen. Automatisierte Prüfungen ersetzen keine interaktive, Multiplayer-, Balance-, Animations- oder Audio/Video-QA. Poker/Blackjack, Fraktionsfähigkeiten, eine vollständige Boss-Handlung, Modusauswahl im Menü und Release-Pakete sind noch nicht fertig. Schmuggel, Waffen, Bestechung und Täuschung sind fiktive Spielmechaniken und keine Anleitung für die reale Welt.

@@ -1,10 +1,10 @@
 # Rush Protocol — Game Overview
 
-**Languages:** English (canonical) · [Deutsch](GAME_OVERVIEW.de.md) · [Русский](GAME_OVERVIEW.ru.md)
+**Languages:** English (canonical) · [Deutsch](GAME_OVERVIEW.de.md) · [Русский](GAME_OVERVIEW.ru.md) · [Game design](docs/GAME_DESIGN.md)
 
 **Project title in Godot:** `Rush_Protocol`\
 **Setting:** Blackglass Casino\
-**Engine:** Godot 4.7\
+**Engine:** Godot 4.7.2\
 **Genre:** Tactical 3D multiplayer/solo prototype with character roles, casino risk actions, smuggling, inventory and hidden objectives
 
 ## 1. Game premise
@@ -67,6 +67,18 @@ Item definitions are Godot resources under `resources/items/`. The current set i
 
 The risk pool is an abstract casino action with positive and negative outcomes that affect chips. Prepared cards can force a favorable risk result. This is **not** a full poker or blackjack implementation: there are no complete private hands, betting rounds, fold/call/raise rules, dealer/opponent logic or authoritative table-game resolution yet. Full playable card tables and balanced cheating counterplay are tracked in [issue #2](https://github.com/Mr1Err0r1/rush_protocol/issues/2).
 
+### Optional match modes
+
+The default configuration uses the chip-pool risk mode and random item distribution. For a local/solo quick test, pass the following user arguments after Godot's `--` separator:
+
+```bash
+godot --path . -- --roulette --draft
+```
+
+`--roulette` selects the Buckshot-inspired `risk_mode = "shells"`: live and blank rounds, a hidden firing order, self-target shots, reloads and mode-specific items. Magazine size and live-shell ratio rise with the highest floor occupied by a living player. `--draft` selects `item_mode = "draft"`: each player receives four distinct role-weighted offers and may choose up to two items, subject to the default inventory capacity of eight. AI chooses automatically; the round waits for pending human picks. A full item-mode and checkpoint reference is in [the trilingual game-design document](docs/GAME_DESIGN.md).
+
+Both modes are optional; `pool` and `random` remain the defaults. A player-facing mode selector is not yet available in the menu, and authoritative online draft synchronization remains follow-up work. These modes do not add complete poker or blackjack rules.
+
 ## 6. Controls
 
 | Input | Prototype action |
@@ -100,14 +112,15 @@ Available actions depend on the active player, match phase and equipped items. B
 
 ## 8. Known limitations and next steps
 
-This is an active prototype, not a finished game or release build. The five-floor environment, role resources, loadout categories and central match systems form a foundation. The major remaining areas include complete poker/blackjack loops, clear and balanced item effects, implemented faction abilities, floor access requirements, a finished boss encounter, onboarding, localization coverage, platform QA and overall balance. Track current work in [GitHub issues](https://github.com/Mr1Err0r1/rush_protocol/issues).
+This is an active prototype, not a finished game or release build. The five-floor environment, role resources, loadout categories and central match systems form a foundation. The major remaining areas include complete poker/blackjack loops, clear and balanced item effects, implemented faction abilities, floor access requirements, a finished boss encounter, interactive onboarding QA, remaining localization coverage, mode selection in menus, authoritative online synchronization for the draft, platform QA and overall balance. Track current work in [GitHub issues](https://github.com/Mr1Err0r1/rush_protocol/issues).
 
 ## 9. Local testing
 
-Use Godot 4.7 or newer for a headless editor import check:
+Use Godot 4.7.2 or newer for the headless checks:
 
 ```bash
-godot --headless --editor --path . --quit
+GODOT=/path/to/godot bash tests/run_tests.sh
+GODOT_BIN=/path/to/godot bash scripts/test/run_headless_smoke.sh
 ```
 
-This import check alone does not certify gameplay balance, online behavior, audiovisual quality or release readiness. A reusable automated scene smoke-test script is proposed in [PR #11](https://github.com/Mr1Err0r1/rush_protocol/pull/11) and is not part of `main` yet.
+The regression suite is run in GitHub Actions with Godot 4.7.2-stable; CI fails if the runner or every test case is missing. The smoke suite checks imports, menus, onboarding, pause transitions and scene startup. Automated tests do not certify gameplay balance, online behavior, audiovisual quality or release readiness.
