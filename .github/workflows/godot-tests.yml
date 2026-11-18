@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  GODOT_VERSION: "4.7-stable"
+  GODOT_VERSION: "4.7.2-stable"
 
 jobs:
   tests:
@@ -24,10 +24,15 @@ jobs:
           chmod +x "$RUNNER_TEMP/godot"
           "$RUNNER_TEMP/godot" --version
 
-      - name: Tests ausführen
+      - name: Testsuite verifizieren
         run: |
-          if [ -f tests/run_tests.sh ]; then
-            GODOT="$RUNNER_TEMP/godot" bash tests/run_tests.sh
-          else
-            echo "tests/run_tests.sh fehlt – erst die Test-PRs mergen."
+          test -f tests/run_tests.sh || { echo "tests/run_tests.sh fehlt"; exit 1; }
+          count=$(find tests -maxdepth 1 -type f -name 'test_*.gd' | wc -l)
+          if [ "$count" -eq 0 ]; then
+            echo "Keine test_*.gd-Fälle gefunden; CI darf nicht grün durchwinken."
+            exit 1
           fi
+          echo "Gefundene Testfälle: $count"
+
+      - name: Tests ausführen
+        run: GODOT="$RUNNER_TEMP/godot" bash tests/run_tests.sh
