@@ -211,6 +211,8 @@ func test_full_inventory_and_modes() -> void:
 
 
 func test_ui() -> void:
+	var previous_locale := LocaleManager.current_locale
+	LocaleManager.current_locale = "de"
 	var mc := _new_match(2)
 	var ui := ItemDraftUI.new()
 	add_child(ui)
@@ -229,6 +231,28 @@ func test_ui() -> void:
 	check(mc.get_state(1).has_item(id), "Klick legt das Item ins Inventar")
 	check(ui._list.get_child_count() == 3, "Angebot schrumpft auf 3 (ist %d)" % ui._list.get_child_count())
 	check(ui._info.text.contains("Noch 1 Wahl"), "Info zeigt 1 übrige Wahl: " + ui._info.text)
+	LocaleManager.current_locale = "en"
+	LocaleManager.locale_changed.emit("en")
+	await get_tree().process_frame
+	check(ui._title.text == "Round — P1 chooses items" and ui._done_btn.text == "Done", "Draft title and action are translated in English")
+	var visible_offer: Button = ui._list.get_child(0)
+	var visible_id: StringName = visible_offer.get_meta("item_id")
+	var visible_locale_id := ui._item_locale_id(visible_id)
+	var visible_item_name := LocaleManager.translate("item." + visible_locale_id)
+	var visible_item := ItemDatabase.get_item(visible_id) as ItemDefinition
+	var visible_category := LocaleManager.translate("item.category." + visible_item.category)
+	var visible_description := LocaleManager.translate("item." + visible_locale_id + "_desc")
+	check(visible_offer.text.contains(visible_item_name) and visible_offer.text.contains(visible_category), "Offer name/category are translated in English")
+	check(visible_offer.tooltip_text == visible_description, "Offer tooltip is translated in English")
+	check(ui._item_locale_id(&"magnifier") == "roulette_magnifier" and LocaleManager.translate("item." + ui._item_locale_id(&"magnifier")) == "Magnifier", "Roulette item label maps to the trilingual locale key")
+	LocaleManager.current_locale = "ru"
+	LocaleManager.locale_changed.emit("ru")
+	await get_tree().process_frame
+	check(ui._title.text == "Раунд — P1 выбирает предметы" and ui._done_btn.text == "Готово", "Draft title and action are translated in Russian")
+	check(ui._info.text.contains("Осталось выборов: 1"), "Draft pick count is translated in Russian")
+	LocaleManager.current_locale = "de"
+	LocaleManager.locale_changed.emit("de")
+	await get_tree().process_frame
 	var btn2: Button = ui._list.get_child(0)
 	btn2.pressed.emit()
 	await get_tree().process_frame
@@ -239,6 +263,7 @@ func test_ui() -> void:
 	check(mc.current_turn_phase == MatchController.TurnPhase.ITEM, "Zug beginnt")
 	ui.free()
 	mc.free()
+	LocaleManager.current_locale = previous_locale
 
 
 func _finish() -> void:

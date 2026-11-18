@@ -26,6 +26,7 @@ func _ready() -> void:
 	_root.visible = false
 	EventBus.item_draft_offered.connect(_on_offered)
 	EventBus.item_draft_finished.connect(_on_finished)
+	LocaleManager.locale_changed.connect(_on_locale_changed)
 
 
 func _build() -> void:
@@ -65,7 +66,7 @@ func _build() -> void:
 	_list.add_theme_constant_override("separation", 6)
 	box.add_child(_list)
 	_done_btn = Button.new()
-	_done_btn.text = "Fertig"
+	_done_btn.text = LocaleManager.translate("draft.done")
 	_done_btn.pressed.connect(_on_done_pressed)
 	box.add_child(_done_btn)
 
@@ -101,16 +102,33 @@ func _refresh() -> void:
 	if state == null or offers.is_empty() or picks <= 0:
 		_show_next()
 		return
-	_title.text = "Runde — %s wählt Items" % state.player_name
+	_title.text = LocaleManager.translate("draft.title", [state.player_name])
 	var cap: int = _mc.match_config.get("inventory_capacity", ItemDraft.INVENTORY_CAPACITY)
-	_info.text = "Noch %d Wahl(en) · freie Plätze im Inventar: %d" % [picks, ItemDraft.free_slots(state, cap)]
+	_info.text = LocaleManager.translate("draft.info", [picks, ItemDraft.free_slots(state, cap)])
+	_done_btn.text = LocaleManager.translate("draft.done")
 	for child in _list.get_children():
 		child.queue_free()
 	for item_id in offers:
 		var idef := ItemDatabase.get_item(item_id) as ItemDefinition
 		var btn := Button.new()
-		btn.text = "%s   [%s]" % [idef.display_name if idef != null else str(item_id), idef.category if idef != null else "?"]
-		btn.tooltip_text = idef.description if idef != null else ""
+		var locale_id := _item_locale_id(item_id)
+		var name_key := "item." + locale_id
+		var item_name := LocaleManager.translate(name_key)
+		if item_name == name_key and idef != null:
+			item_name = idef.display_name
+		var category_name := "?"
+		var description := ""
+		if idef != null:
+			var category_key := "item.category." + idef.category
+			category_name = LocaleManager.translate(category_key)
+			if category_name == category_key:
+				category_name = idef.category.capitalize()
+			var description_key := "item." + locale_id + "_desc"
+			description = LocaleManager.translate(description_key)
+			if description == description_key:
+				description = idef.description
+		btn.text = "%s   [%s]" % [item_name, category_name]
+		btn.tooltip_text = description
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn.set_meta("item_id", item_id)
 		btn.pressed.connect(_on_offer_pressed.bind(item_id))
@@ -141,3 +159,15 @@ func _on_finished(_round_index: int) -> void:
 	if _root.visible:
 		_root.visible = false
 		Input.mouse_mode = _prev_mouse_mode
+
+
+func _on_locale_changed(_locale: String) -> void:
+	_done_btn.text = LocaleManager.translate("draft.done")
+	if _root.visible:
+		_refresh()
+
+
+func _item_locale_id(item_id: StringName) -> String:
+	if item_id in [&"magnifier", &"saw", &"handcuffs", &"medkit"]:
+		return "roulette_" + str(item_id)
+	return str(item_id)
