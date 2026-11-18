@@ -1,14 +1,14 @@
 # Rush Protocol — Blackglass Casino
 
-**Rush Protocol** ist ein taktisches 3D-Spielprototype in Godot 4.7, angesiedelt in einem mehrstöckigen Casino. Wähle eine Rolle, stelle ein begrenztes Loadout zusammen, passiere eine fiktive Einlasskontrolle, verwalte Chips und Misstrauen und versuche, rivalisierende Fraktionen im Casinoturm auszuspielen.
+**Rush Protocol** ist ein taktischer 3D-Spielprototyp in Godot 4.7.2, angesiedelt in einem mehrstöckigen Casino. Wähle eine Rolle, stelle ein begrenztes Loadout zusammen, passiere eine fiktive Einlasskontrolle, verwalte Chips und Misstrauen und versuche, rivalisierende Fraktionen im Casinoturm auszuspielen.
 
 > **Status:** Aktiver Prototyp / vor einem Release. Dieses Repository enthält kein fertiges oder produktionsreifes Spiel. Poker und Blackjack sind noch keine vollständigen spielbaren Tischspiele. Waffen, Schmuggel, Täuschung und Casino-Betrug sind fiktive Spielmechaniken; das Projekt liefert keine Anleitungen für die reale Welt.
 
 ## In deiner Sprache lesen
 
-- [English (primary)](README.md) · [Full game overview](GAME_OVERVIEW.md)
-- **Deutsch (diese Seite)** · [Ausführliche Spielübersicht](GAME_OVERVIEW.de.md)
-- [Русский](README.ru.md) · [Полный обзор игры](GAME_OVERVIEW.ru.md)
+- [English (primary)](README.md) · [Full game overview](GAME_OVERVIEW.md) · [Game design](docs/GAME_DESIGN.md)
+- **Deutsch (diese Seite)** · [Ausführliche Spielübersicht](GAME_OVERVIEW.de.md) · [Spieldesign](docs/GAME_DESIGN.de.md)
+- [Русский](README.ru.md) · [Полный обзор игры](GAME_OVERVIEW.ru.md) · [Дизайн игры](docs/GAME_DESIGN.ru.md)
 
 Englisch ist die maßgebliche Projektdokumentation. Die deutsche und russische Fassung sind Übersetzungen; bei Abweichungen gilt die englische Version.
 
@@ -19,13 +19,15 @@ Englisch ist die maßgebliche Projektdokumentation. Die deutsche und russische F
 - Charakterressourcen für Mafia, Assassinen-Gilde, Zivilisten, Militär, Regierung/Ermittler und Casino-Elite.
 - Rollenabhängige Startwerte, garantierte Ausrüstung sowie Schmuggel- und Loadout-Regeln.
 - Eine fiktive Einlasskontrolle, Misstrauen und Heat, Spielerinventar, Chips, Risikoaktionen und verschiedene Gadgets und Waffen.
+- Einen optionalen, von Buckshot Roulette inspirierten Patronen-Risikomodus (`--roulette`) mit scharfen/Platzpatronen, Nachladen und Roulette-Items; Poker oder Blackjack sind damit nicht vollständig umgesetzt.
+- Einen optionalen Item-Draft pro Runde (`--draft`): vier rollenabhängig gewichtete Angebote, bis zu zwei Auswahlen und acht Inventarplätze. Zufallsverteilung bleibt Standard; Menüschalter und autoritative Online-Synchronisierung des Drafts sind Folgearbeiten.
 - Grundlagen für Hauptmenü, Einstellungen, Speichern, HUD, Solo-/KI-Spiel und Netzwerk.
 
 Einige Funktionen sind noch Prototypen oder datengetriebene Grundlagen. Das Penthouse signalisiert eine Bossbegegnung, aber vollständige Boss-Arena, Questkette und ausgearbeitete Boss-UI sind noch nicht fertig. Poker-/Blackjack-Regeln, Dealer-KI, Fraktionsfähigkeiten, Zugangssperren für Etagen, Balancing und finale Präsentation benötigen weitere Arbeit. Die [ausführliche Spielübersicht](GAME_OVERVIEW.de.md) dokumentiert Funktionen und Einschränkungen.
 
 ## Voraussetzungen und Start
 
-- Godot **4.7 oder neuer** (das Projekt richtet sich an Godot 4.x).
+- Godot **4.7.2 oder neuer** (4.7.2 ist die aktuelle CI-Version).
 - Git, falls du das Repository über die Kommandozeile klonst.
 
 ```bash
@@ -41,7 +43,14 @@ Für einen headless Editor-Import (Godot muss im `PATH` liegen):
 godot --headless --editor --path . --quit
 ```
 
-Dieser Importtest ersetzt weder einen vollständigen interaktiven Spieletest noch eine audiovisuelle Qualitätsprüfung. Das automatisierte Smoke-Testskript `scripts/test/run_headless_smoke.sh` prüft den Szenenstart und Engine-Fehler, ersetzt aber keine Spiel- oder Audio/Video-QA.
+Dieser Importtest ersetzt weder einen vollständigen interaktiven Spieletest noch eine audiovisuelle Qualitätsprüfung. Führe zuerst die Regressionstests und anschließend die Szenen-Smoke-Tests aus:
+
+```bash
+GODOT=/pfad/zu/godot bash tests/run_tests.sh
+GODOT_BIN=/pfad/zu/godot bash scripts/test/run_headless_smoke.sh
+```
+
+GitHub Actions führt die Regressionstests mit Godot 4.7.2 aus und schlägt fehl, wenn der Runner oder alle Testfälle fehlen. Automatisierte Checks ersetzen keine Spiel- oder Audio/Video-QA.
 
 ## Steuerung
 
@@ -79,7 +88,7 @@ scripts/items/           Itemverhalten
 
 ## Mitwirken und Projektdokumentation
 
-Bitte eröffne vor größeren oder bereichsübergreifenden Änderungen ein Issue. Halte Änderungen fokussiert, committe nicht den generierten Godot-Cache `.godot/` und prüfe Ressourcenpfade und Szenen in Godot, bevor du einen Pull Request erstellst. Siehe `CONTRIBUTING.md`, falls vorhanden, und die [ausführliche Spielübersicht](GAME_OVERVIEW.de.md).
+Bitte eröffne vor größeren oder bereichsübergreifenden Änderungen ein Issue. Halte Änderungen fokussiert, committe nicht den generierten Godot-Cache `.godot/` und prüfe Ressourcenpfade und Szenen in Godot, bevor du einen Pull Request erstellst. Siehe [CONTRIBUTING.md](CONTRIBUTING.md) und die [ausführliche Spielübersicht](GAME_OVERVIEW.de.md).
 
 ## Releases
 

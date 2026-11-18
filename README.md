@@ -1,14 +1,14 @@
 # Rush Protocol — Blackglass Casino
 
-**Rush Protocol** is a Godot 4.7 tactical 3D game prototype set in a multi-floor casino. Choose a role, prepare a limited loadout, pass a fictional security check, manage chips and suspicion, and try to outplay rival factions as you move through the casino tower.
+**Rush Protocol** is a Godot 4.7.2 tactical 3D game prototype set in a multi-floor casino. Choose a role, prepare a limited loadout, pass a fictional security check, manage chips and suspicion, and try to outplay rival factions as you move through the casino tower.
 
 > **Status:** Active prototype / pre-release. This repository is not a finished or production-ready game. Poker and blackjack are not yet complete playable table games. Weapons, contraband, deception and casino cheating are fictional game mechanics; this project does not provide real-world instructions.
 
 ## Read this in your language
 
-- **English (primary):** this page and [the full game overview](GAME_OVERVIEW.md)
-- [Deutsch](README.de.md) · [Ausführliche Spielübersicht](GAME_OVERVIEW.de.md)
-- [Русский](README.ru.md) · [Полный обзор игры](GAME_OVERVIEW.ru.md)
+- **English (primary):** this page, [the full game overview](GAME_OVERVIEW.md), and [game design reference](docs/GAME_DESIGN.md)
+- [Deutsch](README.de.md) · [Ausführliche Spielübersicht](GAME_OVERVIEW.de.md) · [Spieldesign](docs/GAME_DESIGN.de.md)
+- [Русский](README.ru.md) · [Полный обзор игры](GAME_OVERVIEW.ru.md) · [Дизайн игры](docs/GAME_DESIGN.ru.md)
 
 English is the canonical project documentation. The German and Russian pages are maintained translations; when they differ, use the English version as the reference.
 
@@ -19,13 +19,15 @@ English is the canonical project documentation. The German and Russian pages are
 - Character resources representing the Mafia, Assassins' Guild, civilians, military, government/investigators and casino elite.
 - Character-specific starting stats, guaranteed equipment and smuggling/loadout rules.
 - A fictional entry inspection, suspicion and heat systems, player inventory, chips, risk actions and a range of gadgets and weapons.
+- Optional Buckshot-inspired shell-risk mode (`--roulette`) with live/blank shots, reloads and roulette items; it is not a complete poker or blackjack game.
+- Optional round item draft (`--draft`): four role-weighted offers, up to two picks and an eight-item inventory cap. Random distribution remains the default; a menu toggle and authoritative online draft sync remain future work.
 - Main-menu, settings, save, HUD, solo/AI and networking foundations.
 
 Several features remain prototypes or data-driven foundations. The penthouse signals a boss encounter, but the complete boss arena, quest chain and polished boss UI are not finished. Poker/blackjack rules, dealer AI, faction abilities, floor access gates, balance and final presentation still need work. See [GAME_OVERVIEW.md](GAME_OVERVIEW.md) for the detailed feature inventory and known limitations.
 
 ## Requirements and run
 
-- Godot **4.7 or newer** (the project targets Godot 4.x).
+- Godot **4.7.2 or newer** (4.7.2 is the current CI target).
 - Git, if cloning from the command line.
 
 ```bash
@@ -41,7 +43,13 @@ For a headless editor import check (requires the Godot executable on `PATH`):
 godot --headless --editor --path . --quit
 ```
 
-This import check does not replace a full interactive playtest or audiovisual QA. Run the project's headless smoke suite to check the editor import, main menu, and every scene:
+This import check does not replace a full interactive playtest or audiovisual QA. Run the regression suite and the scene smoke suite:
+
+```bash
+GODOT=/path/to/godot bash tests/run_tests.sh
+```
+
+The regression suite is also run in GitHub Actions with Godot 4.7.2; CI fails if the test runner or all test cases are missing. To check the editor import, main menu and every scene:
 
 ```bash
 scripts/test/run_headless_smoke.sh

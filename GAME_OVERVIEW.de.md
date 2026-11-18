@@ -1,10 +1,10 @@
 # Rush Protocol — Spielübersicht
 
-**Sprachen:** [English (canonical)](GAME_OVERVIEW.md) · Deutsch · [Русский](GAME_OVERVIEW.ru.md)
+**Sprachen:** [English (canonical)](GAME_OVERVIEW.md) · Deutsch · [Русский](GAME_OVERVIEW.ru.md) · [Spieldesign](docs/GAME_DESIGN.de.md)
 
 **Projekttitel in Godot:** `Rush_Protocol`
 **Setting:** Blackglass Casino
-**Engine:** Godot 4.7
+**Engine:** Godot 4.7.2
 **Genre:** Taktischer 3D-Multiplayer-/Solo-Prototyp mit Charakterrollen, Casino-Risikoaktionen, Schmuggel, Inventar und verdeckten Zielen
 
 ## 1. Spielidee
@@ -67,6 +67,18 @@ Itemdefinitionen sind Godot-Ressourcen unter `resources/items/`. Die aktuelle Sa
 
 Der Risiko-Pool ist eine abstrakte Casino-Aktion mit positiven und negativen Ergebnissen, die Chips verändern. Präparierte Karten können ein günstiges Risikoergebnis erzwingen. Das ist **keine** vollständige Poker- oder Blackjack-Implementierung: Es gibt noch keine vollständigen privaten Hände, Setzrunden, Fold/Call/Raise-Regeln, Dealer-/Gegnerlogik oder autoritative Auflösung am Spieltisch. Vollständige Kartentische und ausgewogene Gegenmechaniken sind in [Issue #2](https://github.com/Mr1Err0r1/rush_protocol/issues/2) erfasst.
 
+### Optionale Match-Modi
+
+Standardmäßig verwendet die Match-Konfiguration den Chip-Pool und eine zufällige Itemverteilung. Für einen lokalen/Solo-Schnelltest können folgende Benutzerargumente hinter dem `--`-Trenner von Godot stehen:
+
+```bash
+godot --path . -- --roulette --draft
+```
+
+`--roulette` wählt den von Buckshot Roulette inspirierten Modus `risk_mode = "shells"`: scharfe und Platzpatronen, verborgene Reihenfolge, Schüsse auf sich selbst, Nachladen und modusspezifische Items. Magazingröße und Anteil scharfer Patronen steigen mit der höchsten Etage eines lebenden Spielers. `--draft` wählt `item_mode = "draft"`: Jeder Spieler erhält vier unterschiedliche, nach Rolle gewichtete Angebote und kann bis zu zwei Items wählen, begrenzt durch das Standard-Inventarlimit von acht. Die KI wählt automatisch; die Runde wartet auf alle ausstehenden menschlichen Auswahlen. Details zu Modi und Kontrollen stehen im [trilingualen Spieldesign-Dokument](docs/GAME_DESIGN.de.md).
+
+Beide Modi sind optional; `pool` und `random` bleiben die Standardwerte. Im Menü gibt es noch keinen Modus-Schalter; die autoritative Online-Synchronisierung des Drafts ist Folgearbeit. Die Modi ergänzen keine vollständigen Poker- oder Blackjack-Regeln.
+
 ## 6. Steuerung
 
 | Eingabe | Prototyp-Aktion |
@@ -100,14 +112,15 @@ Verfügbare Aktionen hängen vom aktiven Spieler, der Matchphase und der Ausrüs
 
 ## 8. Bekannte Grenzen und nächste Schritte
 
-Dies ist ein aktiver Prototyp, kein fertiges Spiel oder Release-Build. Die fünfstöckige Welt, Rollenressourcen, Loadout-Kategorien und zentrale Match-Systeme sind eine Grundlage. Zu den großen offenen Punkten zählen vollständige Poker-/Blackjack-Spielabläufe, verständliche und ausgewogene Itemeffekte, implementierte Fraktionsfähigkeiten, Zugangsvoraussetzungen für Etagen, eine fertige Bossbegegnung, Onboarding, vollständige Lokalisierung, Plattform-QA und Balancing. Aktuelle Arbeit wird in den [GitHub-Issues](https://github.com/Mr1Err0r1/rush_protocol/issues) verfolgt.
+Dies ist ein aktiver Prototyp, kein fertiges Spiel oder Release-Build. Die fünfstöckige Welt, Rollenressourcen, Loadout-Kategorien und zentrale Match-Systeme sind eine Grundlage. Zu den großen offenen Punkten zählen vollständige Poker-/Blackjack-Spielabläufe, verständliche und ausgewogene Itemeffekte, implementierte Fraktionsfähigkeiten, Zugangsvoraussetzungen für Etagen, eine fertige Bossbegegnung, interaktive Onboarding-QA, restliche Lokalisierung, Modusauswahl im Menü, autoritative Online-Synchronisierung des Drafts, Plattform-QA und Balancing. Aktuelle Arbeit wird in den [GitHub-Issues](https://github.com/Mr1Err0r1/rush_protocol/issues) verfolgt.
 
 ## 9. Lokal testen
 
-Für einen headless Editor-Import Godot 4.7 oder neuer verwenden:
+Für die headless-Prüfungen Godot 4.7.2 oder neuer verwenden:
 
 ```bash
-godot --headless --editor --path . --quit
+GODOT=/pfad/zu/godot bash tests/run_tests.sh
+GODOT_BIN=/pfad/zu/godot bash scripts/test/run_headless_smoke.sh
 ```
 
-Dieser Importtest bestätigt weder Gameplay-Balancing noch Online-Funktion, audiovisuelle Qualität oder Release-Reife. Ein wiederverwendbares automatisiertes Szenen-Smoke-Testskript ist in [PR #11](https://github.com/Mr1Err0r1/rush_protocol/pull/11) vorgeschlagen und noch nicht Teil von `main`.
+GitHub Actions führt die Regressionstests mit Godot 4.7.2-stable aus und schlägt fehl, wenn der Runner oder alle Testfälle fehlen. Die Smoke-Suite prüft Import, Menüs, Onboarding, Pause-Übergänge und Szenenstart. Automatisierte Tests bestätigen weder Gameplay-Balancing noch Online-Funktion, audiovisuelle Qualität oder Release-Reife.
