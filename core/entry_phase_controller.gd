@@ -7,6 +7,9 @@ class_name EntryPhaseController
 
 signal entry_phase_complete()
 
+## Würfel-Hook: in Tests durch eine feste Funktion (-> float) ersetzbar.
+var roll_fn: Callable = Callable()
+
 var _pending_checks: Array[int] = []   # player_ids die noch geprüft werden müssen
 var _results: Dictionary = {}          # player_id → {passed, confiscated, suspicion_gained}
 
@@ -50,17 +53,11 @@ func run_check(player_id: int, match_ctrl: Node) -> Dictionary:
 		if idef == null:
 			continue
 
-		# Suspicion der Klasse beeinflusst Entdeckungswahrscheinlichkeit
-		var base_chance: float  = idef.confiscation_chance
-		var suspicion_modifier: float = state.suspicion * 0.03   # 3% pro Suspicion-Punkt
-		var final_chance: float = clampf(base_chance + suspicion_modifier, 0.0, 1.0)
+		# Fundchance: Item-Grundwert, Misstrauen, detection_resistance und
+		# Fraktions-/Rollenprofil (siehe CheckpointRules)
+		var final_chance: float = CheckpointRules.item_find_chance(idef, state.suspicion, char_class, 1.0)
 
-		# Klassen-Bonus: z.B. Assassine kann Waffen besser verstecken
-		if char_class != null and char_class.class_id == &"assassin":
-			if idef.category == "weapon":
-				final_chance *= 0.4   # Assassinen sind Profis im Verstecken
-
-		if randf() < final_chance:
+		if _roll() < final_chance:
 			items_to_remove.append(item_id)
 			result["confiscated"].append(item_id)
 			result["suspicion_gained"] += idef.detection_weight
@@ -99,6 +96,81 @@ func run_check(player_id: int, match_ctrl: Node) -> Dictionary:
 		entry_phase_complete.emit()
 
 	return result
+
+
+## Etagenkontrolle beim Betreten von `zone` (Chancen: CheckpointRules).
+## Ergebnis: {triggered, outcome ("none"|"clear"|"searched"|"confiscated"|"bounced"|"ejected"),
+##            confiscated, suspicion_gained, ejected}
+func run_checkpoint(player_id: int, zone: String, match_ctrl: Node) -> Dictionary:
+	var result := {
+		"triggered": false,
+		"outcome": "none",
+		"confiscated": [] as Array[StringName],
+		"suspicion_gained": 0,
+		"ejected": false,
+	}
+	if not CheckpointRules.is_checkpoint(zone):
+		return result
+	var state: PlayerState = match_ctrl.get_state(player_id)
+	if state == null or state.is_eliminated:
+		return result
+
+	var char_class: CharacterClass = _get_class(state, match_ctrl)
+	var cp: Dictionary = CheckpointRules.CHECKPOINTS[zone]
+	var chance := CheckpointRules.trigger_chance(zone, state.suspicion, state.heat, char_class)
+	if _roll() >= chance:
+		result["outcome"] = "clear"
+		EventBus.checkpoint_result.emit(player_id, zone, "clear", [])
+		return result
+
+	result["triggered"] = true
+	EventBus.checkpoint_started.emit(player_id, zone)
+
+	var guaranteed: Array[StringName] = []
+	if char_class != null:
+		guaranteed = char_class.guaranteed_items
+
+	var found: Array[StringName] = []
+	for item_id in state.smuggled_items.duplicate():
+		if guaranteed.has(item_id) or not state.has_item(item_id):
+			continue
+		var idef: ItemDefinition = ItemDatabase.get_item(item_id)
+		if idef == null:
+			continue
+		var p := CheckpointRules.item_find_chance(idef, state.suspicion, char_class, cp["strictness"])
+		if _roll() < p:
+			found.append(item_id)
+			result["suspicion_gained"] += idef.detection_weight
+
+	for item_id in found:
+		state.smuggled_items.erase(item_id)
+		state.remove_item(item_id)
+		EventBus.item_confiscated.emit(player_id, item_id)
+	result["confiscated"] = found
+
+	var sus_gain: int = result["suspicion_gained"]
+	if sus_gain > 0:
+		state.modify_resource("suspicion", sus_gain)
+		EventBus.player_suspicion_changed.emit(player_id, state.suspicion - sus_gain, state.suspicion)
+
+	if found.size() >= 2 and not _has_bribe(state):
+		result["outcome"] = "bounced"
+		state.modify_resource("heat", 1)
+	elif found.size() >= 1:
+		result["outcome"] = "confiscated"
+	else:
+		result["outcome"] = "searched"
+	if state.is_eliminated:
+		result["outcome"] = "ejected"
+		result["ejected"] = true
+		EventBus.player_ejected.emit(player_id, "caught_smuggling")
+		EventBus.player_eliminated.emit(player_id, -1, state.elimination_cause)
+	EventBus.checkpoint_result.emit(player_id, zone, result["outcome"], found)
+	return result
+
+
+func _roll() -> float:
+	return roll_fn.call() if roll_fn.is_valid() else randf()
 
 
 func _get_class(state: PlayerState, match_ctrl: Node) -> CharacterClass:
